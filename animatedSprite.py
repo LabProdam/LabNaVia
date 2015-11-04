@@ -8,6 +8,10 @@ class animatedSprite(object):
 		self.direction=1
 		self.pos=pos
 		self.preEvents()
+	def get_size(self):
+		return self.sprite_rect.size
+	def get_rect(self):
+		return self.sprite_rect
 	def preEvents(self):
 		self.repeat=self.init_repeat
 	def setLine(self,line):
@@ -29,6 +33,10 @@ class animatedSprite(object):
 						if self.repeat>0:self.repeat-=1
 						rect.x-=rect.w if self.repeat==0 else rect.x
 	def blitOn(self,display):
-		display.blit(self.sprite_sheet.subsurface(self.sprite_rect),self.pos)
+		if display:
+			display.blit(self.sprite_sheet.subsurface(self.sprite_rect),self.pos)
+			return None
+		else:
+			return self.getImage()
 	def getImage(self):
 		return self.sprite_sheet.subsurface(self.sprite_rect)

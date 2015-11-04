@@ -6,7 +6,11 @@ gps_debug=False
 import pygame,os
 from pygame.locals import *
 
+if not pygame.font.get_init():
+	pygame.font.init()
+
 dinB_22=pygame.font.Font('fontes'+str(os.sep)+"DIN-Black.otf",22)
+
 def debugLog(string):
 	global basic_debug
 	if basic_debug: print string

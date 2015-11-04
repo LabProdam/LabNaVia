@@ -6,7 +6,6 @@ from popUp import *
 from trafficLight import getViewport45
 from screenTools import mixer,renderList, textBox,playSound,android,rotateCenter
 from geo import*
-#from screenTools import blitAlpha
 
 auto_gps_ingame=android
 def setAutoGpsIngame(auto=True):
@@ -41,51 +40,20 @@ dinL_16=pygame.font.Font(dir_font+"DIN-Light.otf",16)
 dinL_12=pygame.font.Font(dir_font+"DIN-Light.otf",12)
 dinL_10=pygame.font.Font(dir_font+"DIN-Light.otf",10)
 #imagens
-'''
-self.odometer_img = pygame.image.load(dir_img+"odometer.png").convert_alpha()
-pointer_img  = pygame.image.load(dir_img+"pointer.png").convert_alpha()
-traffic_img  = pygame.image.load(dir_img+"faixas.png").convert_alpha()
-light_img    = pygame.image.load(dir_img+"semaforo.png").convert_alpha()
-car_img      = pygame.image.load(dir_img+"newcar.png").convert_alpha()
-grass_img    = pygame.image.load(dir_img+'gramaFeia2.png').convert()
-track_img    = pygame.image.load(dir_img+'pista3.png').convert_alpha()
-star_img     =[pygame.image.load(dir_img+'estrelaMolde.png').convert_alpha(),
-			   pygame.image.load(dir_img+'estrelaCor.png').convert_alpha()]
-heart_img    = pygame.image.load(dir_img+'coracao1.png').convert_alpha()
-#tutorial_img = pygame.image.load(dir_img+'tutorial.png').convert_alpha()
-#tutorial_img = pygame.transform.scale(tutorial_img,(int(tutorial_img.get_width()/2.5),int(tutorial_img.get_height()/2.5)) )
-end_img      = pygame.image.load(dir_img+'faixa.png').convert()
-pop_bar_score = pygame.image.load(dir_img+"popBar1.png").convert_alpha()
-'''
-#odometer_img = pygame.image.load(dir_img+"odometer.png").convert_alpha()
-pointer_img  = pygame.Surface((10,10),SRCALPHA,32).convert_alpha()#pygame.image.load(dir_img+"pointer.png").convert_alpha()
+pointer_img  = pygame.Surface((10,10),SRCALPHA,32).convert_alpha()
 pygame.draw.circle(pointer_img,(255,0,0),(5,5),5)
-#traffic_img  = pygame.image.load(dir_img+"faixas.png").convert_alpha()
-#light_img    = pygame.image.load(dir_img+"semaforo.png").convert_alpha()
-#car_img      = pygame.image.load(dir_img+"newcar.png").convert_alpha()
-grass_img    = pygame.image.load(dir_img+'gramaFeia2.png').convert()
+grass_img    = pygame.image.load(dir_img+'grama.png').convert()
 track_img    = pygame.image.load(dir_img+'pista4.png').convert_alpha()
 panel_img   = pygame.image.load(dir_img+'painel_menor2.png').convert_alpha()
-#cap_size=(30,100)
 cap_img = [pygame.image.load(dir_img+"pequenoCap"+str(x)+".png").convert_alpha() for x in xrange(2)]
 
 end_img      = pygame.image.load(dir_img+'faixa.png').convert()
 pop_bar_score = pygame.image.load(dir_img+"popBar1.png").convert_alpha()
 
 level_img     = [pygame.image.load(dir_img+"heart"+str(x)+".png").convert_alpha()for x in xrange(2)]
-'''[pygame.image.load(dir_img+"corLv1.png").convert_alpha(),
-				pygame.image.load(dir_img+"corLv2.png").convert_alpha(),
-				pygame.image.load(dir_img+"corLv3.png").convert_alpha(),
-				pygame.image.load(dir_img+"corLv4.png").convert_alpha(),
-				pygame.image.load(dir_img+"corLv5.png").convert_alpha()]
-'''
 				
 cores  	      =	[(149,34,48),(176,4,24),(200,21,42),(210,2,27),(255,4,33)]	
 
-'''		
-bar_level2=[pygame.image.load(dir_img+"levelBarPreenchido.png").convert_alpha(),
-		pygame.image.load(dir_img+"levelBarContorno.png").convert_alpha()]
-'''
 asphalt_img = pygame.image.load(dir_img+"asfalto.png").convert()
 
 culture_img = pygame.image.load(dir_img+"placaBlank.png")
@@ -105,7 +73,7 @@ class gameObject(object):
 		self.name=name
 		self.left_side_name=pygame.transform.rotate(chic_72.render(name,True,(255,255,255)),90)
 		#ciclista jogador 
-		self.player=player#vel*3.6
+		self.player=player
 		self.end_pos=end_pos
 		#lista de ciclistas transeuntes
 		self.odometer_img=odometer
@@ -113,7 +81,6 @@ class gameObject(object):
 		self.obstacles=[[obs*30,None,0,False] for obs in obstacle_list]
 		self.dogs=[[dog*30,False] for dog in dog_list]
 		self.sign_img=sign_img
-		
 		self.home_button=home_button
 		self.retry_button=retry_button
 		self.pause_button=pause_button
@@ -123,31 +90,15 @@ class gameObject(object):
 		self.loser_screen=scr_lose
 		self.winner_screen=scr_win
 		self.score_screen=scr_score
-		self.found=False
-		
 		self.gps=gps_item
-		
-		####---itens em desenvolvimento---####
-		self.traffic_light=traffic_list#[trafficLight(9000,0,5,300,1500),trafficLight(5000,1,15,100,3500),trafficLight(9000,-1,5,300,5500)]
-		#surf=pygame.Surface((400,30))
-		#surf.fill((0,0,0))
+		self.traffic_light=traffic_list
 		self.pop_up=popUp((0,360),(0,360-pop_bar_score.get_height()),(0,-1),pop_bar_score,(40,15))
 		self.pause_tgscr=pause_scr
 		self.setZero()
 		self.fade=pygame.Surface((640,360))
 		self.fade.set_alpha(204)
 		self.color=(0,0,0)
-		self.high_score=[]
-			#NOME,1helmets,2hearts,3time,4red_trlt,5bikers_hit,6bikers_leftbehind,7things_hit,8dog,9check_points,10wrong_side,score calculado
-		'''
-			["SABS!!",4,1,45,0,0,7,0,0,2,0,1050],#self.calculateScore(4,1,45,3,0,0,7,0,0,2,0)],
-			[" BILLY",3,1,50,0,0,6,0,0,2,0,950],#self.calculateScore(3,1,50,3,0,0,6,0,0,2,0)],
-			["_FEFE_",3,1,55,1,1,5,0,0,2,0,350],#self.calculateScore(3,1,55,2,1,1,5,0,0,2,0)],
-			["FREAK ",2,1,60,1,2,4,0,0,2,0,50],#self.calculateScore(2,1,60,2,1,2,4,0,0,2,0)],
-			["CHMPLX",2,1,65,2,3,3,0,0,2,0,-550],#self.calculateScore(2,1,65,1,2,3,3,0,0,2,0)]
-		]
-		'''
-		
+		self.high_score=[]#NOME,1helmets,2hearts,3time,4red_trlt,5bikers_hit,6bikers_leftbehind,7things_hit,8dog,9check_points,10wrong_side,score calculado
 		self.tutorial=False
 		self.blit_panel=True
 		self.blit_timer=True
@@ -157,6 +108,7 @@ class gameObject(object):
 		self.blit_level=True
 		self.heart_pos=(5-14,188-12)
 		self.unlock=None
+		self.found=False
 	def clearScore(self):
 		try:
 			score_file=open(dir_data+"score_data_"+self.name.replace(' ','_')+".lab","wb")
@@ -344,6 +296,7 @@ class gameObject(object):
 	def posEvents(self):
 		self.saveScore()
 		if not self.pause_game:self.start_time-=pygame.time.get_ticks()
+		self.found=False
 	#controle dos eventos
 	def eventControler(self, event,resize,move):
 		if self.pause_game==False and self.end_game==False:
@@ -364,7 +317,7 @@ class gameObject(object):
 			self.health-=1
 			self.recover=[True,0]
 			pygame.time.set_timer(USEREVENT+7,3000)
-	def runEventControler(self, event, resize,move):		
+	def runEventControler(self, event, resize,move):
 		if event.type==KEYUP:
 			if event.key==K_RIGHT: 
 				self.bool[0]=False
@@ -397,12 +350,6 @@ class gameObject(object):
 				if trlt.next_time<pygame.time.get_ticks()-self.start_time: 
 					trlt.eventControler(event,resize,move)
 					trlt.next_time=pygame.time.get_ticks()-self.start_time+trlt.time
-		'''
-		if event.type==USEREVENT+2:
-			value=0
-			for trlt in self.traffic_light:	value+=trlt.eventControler(event,resize,move)
-			if value==0:pygame.time.set_timer(USEREVENT+2,0)
-		'''
 		for dog in dog_img:
 			dog.eventControler(event, resize,move)
 		self.player.eventControler(event,resize)
@@ -415,13 +362,30 @@ class gameObject(object):
 			if rect.collidepoint(mouse_pos):
 				try:self.useHeart()
 				except Exception,e:print e
-			
-	def screenCall(self):#return self.loser_screen if self.lose else self.winner_screen if self.win else None
-		'''if self.pause_button.actived:
-			global pause_tgscr
-			pause_tgscr.turned_on=True
-			self.pause_button.actived=False'''
-		#global pause_tgscr
+			elif len(self.move_button)>0:
+				#hardcode{
+				#desfrear fora do freio
+				if self.move_button[2].pressed_out:
+					if self.player.desaccel!=0.5: 
+						self.move_button[2].callActivation()
+				'''
+				#pedalar fora do pedal/guidão
+				for x in xrange(2):
+					if self.move_button[x].pressed_out and not self.move_button[1 if x==0 else 0].pressed:
+						self.move_button[x].callActivation()
+				'''
+				if not self.move_button[0].rect.collidepoint(mouse_pos) and not self.move_button[1].rect.collidepoint(mouse_pos) and not self.move_button[2].rect.collidepoint(mouse_pos):
+					for x in xrange(3):
+						self.move_button[x].callActivation(False)
+				#'''
+				#}hardcode
+		if event.type==MOUSEMOTION:
+			mouse_pos=(event.pos[0]/resize[0],event.pos[1]/resize[1])
+			move_motion=self.move_button[0].actived or self.move_button[0].pressed or self.move_button[1].actived or self.move_button[1].pressed
+			if self.move_button[2].rect.collidepoint(mouse_pos) and move_motion:
+				for x in xrange(2):
+					self.move_button[x].callActivation(False)
+	def screenCall(self):
 		if self.pause_tgscr.turned_on:
 			self.alpha=True
 			self.color=(120,120,150)
@@ -438,7 +402,7 @@ class gameObject(object):
 				for mvbtt in self.move_button: mvbtt.turnOn()
 		self.endGame(self.win,self.winner_screen,(20,89,75))
 		self.endGame(self.lose,self.loser_screen,(33,33,33))
-		return None#self.loser_screen if self.lose else self.winner_screen if self.win else None
+		return None
 	def endGame(self,win_lose,scr,color):
 		if win_lose and not self.end_game:
 			try:self.score[1]=(float(self.player.maxlife-self.player.damage)/self.player.maxlife)*4
@@ -463,9 +427,7 @@ class gameObject(object):
 			self.score_screen.turnOn(True)
 			self.pause_tgscr.lockOnOff(True)
 			self.pause_button.turnOn(False)
-			try:
-				for mvbtt in self.move_button: mvbtt.turnOn(False)
-			except Exception, e: print e
+			for mvbtt in self.move_button: mvbtt.turnOn(False)
 			self.end_game=True
 			self.pause_game=True
 			try:self.printScore()
@@ -474,7 +436,7 @@ class gameObject(object):
 			except Exception,e:print 'hsc'+str(e)
 			self.score_screen.itens[0].img=self.blitHighScore().convert_alpha()
 		
-#manipulacao dos elementos HUD da tela #####################################################
+	#manipulacao dos elementos HUD da tela
 	def blitPanel(self,display,pos):
 		global panel_img
 		#blitAlpha(display,panel_img,pos,100)
@@ -504,12 +466,10 @@ class gameObject(object):
 		pygame.Rect( (600+(x*5),150+(25*x) ),(35-(x*5),20 ) ) for x in xrange(5) ]
 	def blitSpeed(self,display,pos):
 		value=self.player.vel/self.player.max_vel
-		#rect=pygame.Rect(pos,(20,20) )
 		for x,rect in enumerate(self.speed_rects):
 			color=((50*x)+55,255-(50*x),55)
 			print color
 			display.fill(color,rect)
-		#display.fill((0,0,0),rect.move(+10,+60))
 		
 	def blitTrack(self,display,pos):
 		global dinL_16, pointer_img
@@ -519,10 +479,6 @@ class gameObject(object):
 		render=dinL_16.render( str(self.end_pos/30)+"m" if self.end_pos<30000 else str(float(self.end_pos)/30000)+"km",True,(0,0,0))
 		x=render.get_rect(center=(pos[0]+self.odometer_img.get_width()/2,0)).x
 		display.blit(render,(x,pos[1]-dinL_16.get_height()))
-		'''
-		else:
-			display.blit(dinL_16.render(str(float(self.end_pos)/30000)+"km",True,(0,0,0)),(pos[0]+self.odometer_img.get_width()/2,pos[1]-self.odometer_img.get_height()-dinL_16.size(str(float(self.end_pos)/30000)+"km")))
-		'''
 	def blitLife(self,display,pos):
 		global cap_img
 		display.blit(pygame.transform.chop(cap_img[1],pygame.Rect(0,0,0,cap_img[1].get_height()*self.player.damage/self.player.maxlife)),(pos[0],pos[1]+cap_img[1].get_height()*self.player.damage/self.player.maxlife))
@@ -554,118 +510,8 @@ class gameObject(object):
 		lentext=dinL_16.size(text)
 		
 		display.blit(dinL_16.render(text,True,(0,0,0)),(pos[0]-lentext[0]/1.5,pos[1]))
-		'''
-		#calculo score geral
-		self.score=meters_score+(biker_counter*100-(self.collision_counter*110))-self.left_ride_score-self.traffic_score
-
-
-		#score necessário para próximo nível
-	
-		text=str(int(self.score))+str(xpMax[self.i])+'/'
-		lenText=dinL_16.size(text)
-		
-		
-		score=self.score #if self.i==0 else self.score-xpMax[self.i-1]
-		
-		display.blit(pygame.transform.chop(bar_level2[0],pygame.Rect(0,bar_level2[0].get_height()*int(score)/(xpMax[self.i]),0,bar_level2[0].get_height())),(pos[0],pos[1]))
-		#score/xpMax
-		display.blit(dinL_16.render(str(int(self.score))+'/'+str(xpMax[self.i]),True,(0,0,0)),((pos[0]+(bar_level2[0].get_width()/2-lenText[0]/2)),pos[1]-15))
-		#contorno da barra de level
-		display.blit(bar_level2[1],(pos[0],pos[1]))
-		'''	
-
-	'''
-	def blitTimer(self,display,pos):
-		global dinL_16
-		tempo=(pygame.time.get_ticks()-self.start_time)
-		resto_tempo=tempo%60000
-		fonte_timer=dinL_16
-		recuo=fonte_timer.size('00 : ')[0]
-		if (tempo - resto_tempo)/60000>9:
-			display.blit(fonte_timer.render( str((tempo - resto_tempo)/60000)+' : ',True,(0,0,0)),(pos[0],pos[1]))
-		else:
-			display.blit(fonte_timer.render( '0'+str((tempo - resto_tempo)/60000)+' : ',True,(0,0,0)),(pos[0],pos[1]))
-		if (resto_tempo - (resto_tempo%1000) )/1000>9:
-			display.blit(fonte_timer.render( str( (resto_tempo - (resto_tempo%1000) )/1000),True,(0,0,0)),(pos[0]+recuo,pos[1]))
-		else:
-			display.blit(fonte_timer.render( '0'+str( (resto_tempo - (resto_tempo%1000) )/1000),True,(0,0,0)),(pos[0]+recuo,pos[1]))
-		#display.blit(fonte_timer.render( str(resto_tempo%100),True,(0,0,0)),(140-fonte_timer.size(str(resto_tempo%100))[0],0))
-		
-	def blitSpeed(self,display,pos):
-		global dinB_16,dinB_22,dinBd_32
-		display.blit(dinBd_32.render(str(int(self.player.vel*3.6)),True,(0,0,0)),(pos[0]-dinBd_32.size(str(int(self.player.vel*3.6)))[0],pos[1]))
-		display.blit(dinB_22.render('km/h',True,(0,0,0)),(pos[0],pos[1]+10))
-		
-	def blitTrack(self,display,pos):
-		global dinL_16, self.odometer_img,pointer_img
-		#display.blit(dinB_16.render(str(round((self.player.odometer/30),1))+' m',True,(200,200,0)),(pos[0]-dinB_16.size(str(round((self.player.odometer/30),1))+' km')[0],pos[1]))
-		#display.blit(dinB_16.render('de '+str(self.end_pos/30)+' m',True,(155,0,0)),(pos[0]-58,pos[1]+22))
-		display.blit(self.odometer_img,pos)
-		display.blit(pointer_img,(pos[0]+(self.odometer_img.get_width()*(self.player.odometer/self.end_pos))-(pointer_img.get_width()//2),pos[1]-pointer_img.get_height()+self.odometer_img.get_height()))
-		if self.end_pos<30000:
-			display.blit(dinL_16.render(str(self.end_pos/30)+"m",True,(0,0,0)),(30+self.odometer_img.get_width(),pointer_img.get_height()))
-		else:
-			display.blit(dinL_16.render(str(self.end_pos/30000)+"km",True,(0,0,0)),(30+self.odometer_img.get_width(),pointer_img.get_height()))
-	def blitLife(self,display,pos):
-		global star_img
-		display.blit(pygame.transform.chop(star_img[1],pygame.Rect(0,0,star_img[1].get_width()*self.player.damage/self.player.maxlife,0)),(pos[0]+star_img[1].get_width()*self.player.damage/self.player.maxlife,pos[1]))
-		display.blit(star_img[0],pos)
-	def blitHeart(self,display,pos):
-		global heart_img
-		heart=pygame.Surface(heart_img.get_size())
-		health=self.player.odometer/self.end_pos
-		#health=(health*105)+150 if self.player.odometer//250%2==0 else (health*155)+50
-		heart.blit(display,(-pos[0],-pos[1]))
-		heart.fill((255,30,50),pygame.Rect(0,heart_img.get_height()-(heart_img.get_height()*health),heart_img.get_width(),(heart_img.get_height()*health)))
-		heart.set_colorkey((100,255,0))
-		heart.blit(heart_img,(0,0))
-		display.blit(heart,pos)
-	def blitExp(self,display,pos):
-		global dinB_22
-		#covered_meters = self.player.odometer/30
-		#meters_to_covered = self.end_pos/30
-		meters_score=0
-		# a cada terco do caminho completo, o jogador tera uma pontuacao para o caminho percorrido diferente
-		if self.player.odometer > self.end_pos/3:
-			if self.player.odometer < self.end_pos/1.5:
-				meters_score=700
-			if self.popup_bool[0]:
-				self.pop_up.callPopup(dinB_22.render(' 1/3 completo da pista ++PONTOS!!',True, (47,240,67)),1000)
-				self.popup_bool[0]=False
-			if trlt.odometer<=self.player.odometer and self.player.odometer-trlt.odometer<=1377:
-		if self.player.odometer > self.end_pos/1.5:
-			if self.player.odometer < self.end_pos/1:
-				meters_score=1400
-			if self.popup_bool[1]: 
-				self.pop_up.callPopup(dinB_22.render('2/3 da pista completos ++PONTOS!!',True, (47,240,67)),1000)
-				self.popup_bool[1]=False
-			
-		if self.player.odometer > self.end_pos/1:
-			meters_score=2100
-			if self.popup_bool[2]:
-				self.pop_up.callPopup(dinB_22.render('Voce terminou ++PONTOS!!',True, (47,250,67)),1000) 
-				self.popup_bool[2]=False
-
-		
-		#calculo score geral
-		self.score=meters_score+(biker_counter*100-(self.collision_counter*110))-self.left_ride_score-self.traffic_score
-		
-		if self.score < 0:
-			self.score = 0
-		
-		display.blit(dinB_22.render('Pontos: '+str(int(self.score)),True, (0,0,0)),(30,100))
-	
-	#
-	#
-	#
-		#blit teste
-		#display.blit(dinB_22.render('covMeters:'+str(meters_score),True,(0,0,0)),(30,120))
-		#display.blit(dinB_22.render('bkCounter'+str(biker_counter),True,(0,0,0)),(30,140))
-		#display.blit(dinB_22.render('colCOunter'+str(self.collision_counter),True,(0,0,0)),(30,160))
-############################################################################################
 
 	#desenho dos elementos na tela	
-	'''
 	def blitOn(self, display):
 		global grass_img,track_img,end_img,asphalt_img,traffic_img,car_img,light_img#,tutorial_img
 		global culture_img,culture_rect
@@ -708,14 +554,6 @@ class gameObject(object):
 			if trlt.odometer<=self.player.odometer and self.player.odometer-trlt.odometer<=1377:
 				try:trlt.blitOn(display,render_list,self.player,self.pause_game,self.found or not android,self.start_time)
 				except Exception,e: print 'trlt.blitOn() error:\n\t'+str(e)
-				'''
-				global traffic_img, car_img, light_img
-				try:self.traffic_score+=trlt.blitOn(display,render_list,self.player,self.bikers,traffic_img, car_img, light_img, self.pause_game,asphalt_img)
-				except Exception,e: print 'trlt.blitOn() error:\n\t'+str(e)
-				
-				try:self.traffic_score+=trlt.blitOn(display,render_list,self.player,self.found or not android)
-				except Exception,e: print 'trlt.blitOn() error:\n\t'+str(e)
-				'''
 				crosswalk=trlt.getCrosswalkRect()
 				if crosswalk:crosswalk_rect.append(crosswalk)
 		
@@ -733,16 +571,12 @@ class gameObject(object):
 							surf.fill((255,255,255))
 							surf.blit(culture_name,(0,0))
 							surf.blit(culture_dist,(0,culture_name.get_height()))
-							#surf=pygame.transform.scale(surf,culture_rect.size)
 							culture_img.fill((255,255,255),culture_rect)
 							culture_img.blit(surf.convert(),culture_rect.topleft)
 							self.sign_build=True
 							print 'builded'
 						render_list.blit(culture_img,(400+sign_pos_vp/4,sign_pos_vp-culture_img.get_height()))
 				except Exception,e:print e
-				#	print len(self.gps.finder.getLocals() )
-				#	print len(self.gps.finder.getDistances() )
-				#display.blit(self.sign_img,(420+(self.player.odometer-self.sign_pos)/4,self.player.odometer-self.sign_pos-self.sign_img.get_height()))
 			else: 
 				self.sign_pos+=1377
 				self.sign_pointer+=1
@@ -753,8 +587,7 @@ class gameObject(object):
 					if len(self.gps.finder.getLocals())<=self.culture_pointer: self.culture_pointer=0
 		if self.end_pos-360-100<=self.player.odometer:
 			for i in range(7): render_list.blit(end_img,(end_img.get_width()*i,self.player.odometer-self.end_pos+360))
-			#display.fill((0,0,0),pygame.Rect(0,self.player.odometer-self.end_pos+360, 640, 50))
-		
+
 		#verifica os eventos de colisao com cada obstaculo
 		for obs in self.obstacles:
 			if obs[0]<=self.player.odometer:
@@ -772,9 +605,9 @@ class gameObject(object):
 						pos[0]-=new_size[0]//2
 					rect=obs[1].get_rect(topleft=pos)
 					if self.player.wheels_box.colliderect(rect):
-						if android and not self.end_game: android.vibrate(0.5)
 						if self.player.vel>0: self.player.vel-=self.player.vel*0.1*self.player.desaccel
-						if obs[3]==False:
+						if obs[3]==False and not self.end_game and not self.pause_game:
+							if android: android.vibrate(0.2)
 							if self.player.vel>0: self.player.vel-=1
 							self.score[7]+=1
 							obs[3]=True
@@ -794,28 +627,21 @@ class gameObject(object):
 						pos[0]+=pos[1]/4
 						if dog[1]==False:
 							rect=pygame.Rect(pos[0]-150,pos[1],140,new_size[1])
-							#render_list.fill((255,0,0),rect)
 							if self.player.hit_box.colliderect(rect):
 								self.player.h_vel=-10
 								self.player.vel=0
 								self.score[8]+=1
 								playSound(dog_bark)
+								if android: android.vibrate(0.3)
 								dog[1]=True
 						render_list.blit(dog_image,pos)
 		except Exception,e:print e
 					
 		#verifica os eventos de colisao com cada ciclista transeunte
-		biker_counter=0# biker_counter=0
+		biker_counter=0
 		for bike in self.bikers:
 			if bike.odometer<=self.player.odometer: 
-				if bike.pos[1]<=360:#+bike.img.get_height():
-					'''
-					try:
-						self.collision_counter+=bike.collide(self.player)
-						if not self.pause_game and not bike.stop: bike.passerbyMotion(self.player.vel)
-						bike.blitOn(render_list)
-					except Exception,e:print e
-					'''
+				if bike.pos[1]<=360:
 					#flipa
 					fliped_bike=pygame.transform.flip(bike.img,bike.flip,False)
 					#bike.pos
@@ -832,7 +658,6 @@ class gameObject(object):
 						new_pos=[bike.pos[0]-(new_size[0]/2),bike.pos[1]]
 					bike_hit_box_x=pygame.Rect(new_pos[0],new_pos[1]+int(new_size[1]*0.2),bike.img.get_width(),int(new_size[1]*0.6))#horizontal
 					bike_hit_box_y=pygame.Rect(int(new_pos[0]+new_size[0]*0.2),new_pos[1],int(bike.img.get_width()*0.6),new_size[1])#vertical
-					#player_hit_box=pygame.Rect(self.player.pos[0],self.player.pos[1]+(self.player.img.get_height()/3),self.player.img.get_width()/3,self.player.img.get_height()*2/3)
 					#colisao horizontal
 					if bike_hit_box_x.colliderect(self.player.hit_box):
 						if self.player.pos[0]>new_pos[0]+(new_size[0]//2):
@@ -851,8 +676,6 @@ class gameObject(object):
 							self.collision_counter+=1
 							#retira pontos
 							self.player.setScore(-50)
-							#if self.score > 0: self.score-=175
-							#if self.score<0: self.score=0
 					if len(crosswalk_rect)==0: bike.stop=False
 					for crosswalk in crosswalk_rect:
 						if bike.accel>0:
@@ -878,16 +701,15 @@ class gameObject(object):
 					if not self.pause_game and not bike.stop: bike.passerbyMotion(self.player.vel)
 					
 					render_list.blit(scaled_bike ,new_pos )
-					#'''
 				#pontuacao para ultrapassagem
 				else:
-					biker_counter+=1# biker_counter+=1
+					biker_counter+=1
 					if bike.pos[1]<460: 
 						self.player.setScore(100)
 						bike.pos[1]=460
 		self.score[6]=biker_counter
 		#condicao vitoria e derrota
-		if self.end_pos<=self.player.odometer:#if biker_counter==len(self.bikers):
+		if self.end_pos<=self.player.odometer:
 			self.win=True
 		if self.player.damage>=self.player.maxlife: 
 			self.lose=True
@@ -911,12 +733,6 @@ class gameObject(object):
 			try:
 				if self.blit_track:self.blitTrack(display,(580,77))
 			except Exception,e: print 'blitTrack() error:\n\t'+str(e)
-			#score
-			'''
-			try:
-				if self.blit_score:self.blitScore(display,(600,60))#display.blit(dinB_22.render('Pontos: '+str(int(self.score)),True, (0,0,0)), (30,144))
-			except Exception,e: print 'blitExp() error:\n\t'+str(e)
-			'''
 			#estrela
 			try:
 				if self.blit_life:self.blitLife(display,(15,39))
@@ -925,41 +741,13 @@ class gameObject(object):
 			try:
 				if self.blit_level:self.blitLevel(display,self.heart_pos)
 			except Exception,e: print 'blitLevel() error:\n\t'+str(e)
-			#coracao
-			#self.blitHeart(display,(490,50))
 			#popup
 			try:self.pop_up.blitOn(display)
 			except Exception,e: print e
-		#esmaecer=pygame.Surface((640,360))
-		#esmaecer.fill(self.color)
-		#blitAlpha(display,esmaecer,(0,0),self.alpha)
 		if self.alpha:
 			self.fade.fill(self.color)
 			display.blit(self.fade,(0,0))
 		if self.end_game:
 			try:display.blit(self.left_side_name,(45,45))
 			except Exception,e:print e
-			#self.blitFinalScore(display,(0,0),150)
-			#if self.win:self.blitHighScore(display,(250,0))
 	def screenManipulation(self,screen):pass
-'''
-class winObject(object):
-	def __init__(self,player):
-		self.player=player
-		self.score=[('Champion',100000),
-					('Champlix',10000),
-					('Champlow',1000),
-					('Chanklsh',100),
-					('Champlum',10)]
-		self.pos=len(self.score)+2
-	def preEvents(self):
-		for pos in len(self.score):
-			if self.player.score>self.score[pos][1]:
-				self.pos=pos
-	def posEvents(self):
-		self.pos=len(self.score)+2
-	def blitOn(self,display):pass
-'''
-
-	
-

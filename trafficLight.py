@@ -10,7 +10,6 @@ dir_auto=dir_img+'auto'+str(os.sep)
 #imagens
 car_images=[pygame.image.load(dir_auto+"autoC"+str(x)+".png").convert_alpha() for x in range(1,4)]
 truck_images=[pygame.image.load(dir_auto+"autoT"+str(x)+".png").convert_alpha() for x in range(1,3)]
-#car_images+=truck_images
 traffic_img  = pygame.image.load(dir_img+"faixas3.png").convert_alpha()
 light_img    = pygame.image.load(dir_img+"semaforo.png").convert_alpha()
 light_scale=(light_img.get_width()//3)/light_img.get_height()
@@ -33,7 +32,7 @@ class carObject(object):
 		self.move=0
 	def moveCar(self):
 		#soma a velocidade em x
-		move=self.vel#+(h*self.direction)#*self.scale*h
+		move=self.vel
 		self.rect.x+=move
 		self.move+=move
 		#se passar de um dos limites retorna verdadeiro para ser removido
@@ -45,13 +44,13 @@ class carObject(object):
 		self.vel*=3
 	def blitCar(self,display,y,h):
 		self.rect.y=y
-		self.scaled_rect=pygame.Rect(0,0,int(h*self.scale),h)# self.rect.inflate(int(h*self.scale),h)
+		self.scaled_rect=pygame.Rect(0,0,int(h*self.scale),h)
 		self.scaled_rect.topleft=self.rect.topleft
 		self.scaled_img=pygame.transform.scale(self.img,self.scaled_rect.size)
 		display.blit(self.scaled_img,self.rect.topleft)
 	def collideCar(self,player):
 		try:
-			if self.scaled_rect.colliderect(player.hit_box): player.receiveDamage(1,(self.vel*self.direction,0))
+			if self.scaled_rect.colliderect(player.hit_box): player.receiveDamage(10,(self.vel*self.direction,0))
 		except Exception,e:print e
 		
 
@@ -63,7 +62,7 @@ def getViewport45(distancia_viewport,posicao_real,altura_camera):
 	
 class trafficLight(object):
 	def __init__(self,time,direction,vel,freq,appear):
-		freq+=372#396
+		freq+=372
 		self.odometer=appear#quando aparece no jogo
 		self.vel=vel#velocidade dos carros na travessa
 		self.frequency=freq#frequencia dos carros(tempo de criacao)
@@ -71,7 +70,6 @@ class trafficLight(object):
 		self.direction=direction#-1=esquerda 0=faixa dupla +1=direita
 		
 		self.time=time#tempo de farol vermelho
-		#self.dy=0
 		self.setZero()
 	def setZero(self):
 		self.crosswalk_rect=pygame.Rect(0,0,0,0)
@@ -111,14 +109,13 @@ class trafficLight(object):
 	def getStreetRect(self):
 		return self.street_rect if self.turned_on else None
 	def getCrosswalkRect(self):
-		return self.crosswalk_rect if self.turned_on else None#pygame.Rect(0,0,0,0)
+		return self.crosswalk_rect if self.turned_on else None
 	def blitOn(self,final_display,listed_display,player,pause,gps,game_timer):
 		global asphalt_img,traffic_img,light_img
 		global car_images,truck_images
 		auto_images=car_images+(truck_images if gps else [])
 		if self.timer_start:
 			self.next_time=pygame.time.get_ticks()-game_timer+self.time
-			#pygame.time.set_timer(USEREVENT+2,self.time)
 			self.turned_on=self.turnOnOff(self.turned_on)
 			self.timer_start=False
 		pos=(0,player.odometer-self.odometer)
@@ -137,7 +134,7 @@ class trafficLight(object):
 			self.player_infraction=True
 		#1º ciclo foreach, mas só repete duas vezes
 		new_freq=self.freq_scale*rect_1.h
-		for d in range(2):
+		for d in xrange(2):
 			if self.direction==0: 
 				car_y=rect_1.y+(rect_1.h/4)-(d*rect_1.h/2)
 			else:
@@ -149,15 +146,14 @@ class trafficLight(object):
 					car.rect.x+=(new_freq-car.frequency)*(car_len-c)*car.direction
 					car.frequency=new_freq
 				if not pause: 
-					remove=car.moveCar()#self.frequency*rect_1.y/720)
+					remove=car.moveCar()
 					car.collideCar(player)
 				car.blitCar(listed_display,car_y,rect_1.h)
-				if not pause and remove: self.car_list[d].remove(car)#;print 'removed'+str(len(self.car_list[d]))
+				if not pause and remove: self.car_list[d].remove(car)
 			if len(self.car_list[d])>0 and self.turned_on:
-				if abs(self.car_list[d][-1].move)>new_freq:#self.frequency*(1+(rect_1.y/36)):
+				if abs(self.car_list[d][-1].move)>new_freq:
 					image=pygame.transform.flip(random.choice(auto_images),d==0,False)
 					self.car_list[d].append(carObject(-image.get_width() if d==0 else 640, -self.vel*((d*2)-1), image  ,new_freq))
-					#self.car_list[d].append(carObject(self.car_list[d][-1].rect.x+(self.frequency*((d*2)-1)), self.car_list[d][-1].vel, image  ))
 				
 		if self.direction==0:
 			rect_2.y+=rect_1.h*0.5
@@ -187,157 +183,3 @@ class trafficLight(object):
 		
 		self.running=True
 		return 0
-		
-
-'''
-class trafficLightOld(object):
-	def __init__(self,time,direction,vel,freq,appear):
-		self.odometer=appear#quando aparece no jogo
-		self.vel=vel#velocidade dos carros na travessa
-		self.frequency=freq#frequencia dos carros(tempo de criacao)
-		self.direction=direction#-1=esquerda 0=faixa dupla +1=direita
-		self.time=time#tempo de farol vermelho
-		#self.dy=0
-		self.setZero()
-	def setZero(self):
-		self.car_stop=10
-		self.car_pos=0
-		self.turned_on=False#True se o farol esta verde
-		self.timer_start=True#inicia o timer na primeira passada do codigo
-		self.street=False
-		self.crosswalk=False
-		self.boolean=False
-	def eventControler(self,event,resize,move):
-		if self.turned_on:
-			pygame.time.set_timer(USEREVENT+2,0)
-			self.turned_on = False
-	def blitOn(self,real_display,display,player,bikers,traffic_img,car_img,light_img, pause_game,asphalt_img):
-		if self.timer_start:
-			pygame.time.set_timer(USEREVENT+2,self.time) #liga o timer
-			self.turned_on=True #liga o semaforo
-			self.timer_start=False
-		#global traffic_img
-		pos=(0,player.odometer-self.odometer)
-		y=getViewport45(400,(255*11)-(pos[1]*2),150)#y faixa1
-		
-		h=getViewport45(400,(255*12)-(pos[1]*2),150)#y faixa1 + h faixa1
-		h_2=getViewport45(400,(255*15)-(pos[1]*2),150)#y faixa1 + h rua(2)
-		h_3=getViewport45(400,(255*20)-(pos[1]*2),150)#y faixa1 + h faixa2(3)
-		
-		rect_0=pygame.Rect(pos[0],360-y,640,h-y)#faixa 1
-		rect_1=pygame.Rect(pos[0],rect_0.y+rect_0.h,640,h_2-y)#rua
-		rect_2=pygame.Rect(pos[0],rect_1.y+rect_1.h,640,h_3-y)#faixa 2
-		if self.direction==0:
-			rect_2.y+=rect_1.h*0.5
-			rect_1.h*=1.5
-		#faixa de pedestre 1
-		
-		try:
-			if rect_0.y<=360:real_display.blit(traffic_img.subsurface(pygame.Rect(rect_0.x,rect_0.y,rect_0.w,360-rect_0.y) if rect_0.h+rect_0.y>360 else rect_0),(rect_0.x,rect_0.y))
-	
-			#rua, asfalto
-			#display.fill((50,50,50),rect_1)
-			real_display.blit(pygame.transform.scale(asphalt_img,(rect_1.w,rect_1.h)),(rect_1.x,rect_1.y))
-	
-			#faixa de pedestre 2
-			if rect_2.y<=360:real_display.blit(traffic_img.subsurface(pygame.Rect(rect_2.x,rect_2.y,rect_2.w,360-rect_2.y) if rect_2.h+rect_2.y>360 else rect_2),(rect_2.x,rect_2.y))
-		except Exception,e:print e;print rect_0; print rect_2
-		
-		
-		#global light_img
-		
-		sprite_sheet=0 if self.turned_on else 1
-		
-		w_lt=light_img.get_width()/3
-		h_lt=light_img.get_height()
-		
-		#rect que define a parea de colisao do player
-		player_hit_box=player.img.get_rect(x=player.pos[0],y=player.pos[1])
-		#diminui pela metade a caixa de colisao do player (perspectiva)
-		player_hit_box.y+=player_hit_box.h/3
-		player_hit_box.h-=player_hit_box.h*2/3
-		
-		#poste da esquerda (costas)
-		crop_rect=pygame.Rect(w_lt*2,0,w_lt,h_lt)
-		display.blit(light_img.subsurface(crop_rect),(120-((rect_0.y-h_lt)//4),(rect_0.y-h_lt)))
-		
-		car_h=rect_1.h #if self.direction==0 else rect_1.h
-			
-		#global car_img
-		car_scale=(car_h/float(car_img.get_height()))
-		car_w=int(car_img.get_width()*car_scale)
-		new_car_img=pygame.transform.scale(car_img,(car_w,car_h))
-		#new_car_img2=pygame.Surface(new_car_img.get_size() )
-		#carros na pista
-		car_qnt=self.car_stop
-		#print self.car_pos+self.frequency*car_qnt
-		##
-		if self.car_pos>640+(car_w+self.frequency)*(car_qnt-1):
-			self.boolean=True
-		if not self.boolean:
-			if self.direction<+1:
-				for car in range(car_qnt):
-					carro_0=pygame.Rect(640-self.car_pos+(car_w+self.frequency)*car-car_w,-car_h+rect_1.y+rect_1.h/2 if self.direction==0 else -car_h+rect_1.y+(rect_1.h*3/4),car_w,car_h)
-					#carro_0=pygame.Rect(640-self.car_pos+(car_w+self.frequency)*car-car_w,-car_h+rect_1.y+rect_1.h/2 if self.direction==0 else -car_h+rect_1.y+(rect_1.h*3/4),car_w,car_h)
-					#display.fill((255,255,255),carro_0)
-					#new_car_img2.fill((0,0,0))
-					#new_car_img2.blit(new_car_img,(0,0))
-					#new_car_img2.blit(dinB_22.render(str(car),False,(255,0,0)),(0,0))
-					display.blit(new_car_img,(carro_0.x,carro_0.y))
-					if not pause_game and player_hit_box.colliderect(carro_0): player.receiveDamage(1,(-10,0))
-					if not self.turned_on and carro_0.x>640-car_w and self.car_stop==10: self.car_stop=car
-			if self.direction>-1:
-				for car in range(car_qnt):
-					carro_1=pygame.Rect(-100+self.car_pos-(car_w+self.frequency)*car+car_w,rect_1.y+rect_1.h-car_h if self.direction==0 else -car_h+rect_1.y+(rect_1.h*3/4),car_w,car_h)
-					#display.fill((255,255,255),carro_1)
-					#new_car_img2.fill((0,0,0))
-					#new_car_img2.blit(new_car_img,(0,0))
-					#new_car_img2.blit(dinB_22.render(str(car),False,(255,0,0)),(0,0))
-					display.blit(pygame.transform.flip(new_car_img,True,False),(carro_1.x,carro_1.y))
-					if not pause_game and player_hit_box.colliderect(carro_1): player.receiveDamage(1,(+10,0))
-					if not self.turned_on and carro_1.x<0 and self.car_stop==10: self.car_stop=car
-	
-			if not pause_game and self.car_pos<=640+(car_w+self.frequency)*car+car_w:self.car_pos+=self.vel#if self.turned_on: self.car_pos+=10
-#			if not self.turned_on: #else: self.car_pos=100
-#				if self.direction<+1: display.blit(new_car_img,(640-car_w,carro_0.y))
-#				if self.direction>-1: display.blit(pygame.transform.flip(new_car_img,True,False),(0,carro_1.y))
-#			else: 
-			if self.turned_on:
-				if self.car_pos>=640+car_w+self.frequency: self.car_pos-=car_w+self.frequency
-		
-		
-		
-		#poste da direita (frente)
-		crop_rect.x=w_lt*sprite_sheet
-		display.blit(light_img.subsurface(crop_rect),(460+((rect_2.h+rect_2.y-h_lt)//4),(rect_2.h+rect_2.y-h_lt)))
-		
-		tf_score_return=0
-		if self.turned_on:
-			#tratamentos no score (infracoes)
-			if player_hit_box.colliderect(rect_1) and self.street==False:
-				tf_score_return+=200#self.score-=200
-				self.street=True
-			if player_hit_box.colliderect(rect_2) and self.crosswalk==False:
-				tf_score_return+=25#self.score-=25
-				self.crosswalk=True
-			#parar NPCs antes da faixa
-			for bike in bikers:
-				if bike.odometer<=player.odometer and bike.pos[1]<=360:
-					if bike.pos[1]>rect_0.y-bike.img.get_height():
-						if bike.accel>0: 
-							bike.stop=True
-							bike.vel=0
-					if bike.pos[1]<rect_2.y+rect_2.h: 
-						if bike.accel<0: 
-							bike.stop=True
-							bike.vel=0
-				if bike.stop:
-					if bike.accel<0: bike.pos[1]=rect_2.y+rect_2.h
-					else: bike.pos[1]=rect_0.y-bike.img.get_height()
-		else:
-			#mover NPCs que foram parados
-			for bike in bikers:
-				if bike.odometer<=player.odometer and bike.pos[1]<=360:
-					if bike.stop: bike.stop=False
-		return tf_score_return
-'''

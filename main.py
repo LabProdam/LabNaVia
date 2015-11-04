@@ -9,7 +9,6 @@
 import time
 import pygame,sys
 from pygame.locals import *
-from AAfilledRoundedRect import AAfilledRoundedRect
 
 FPS=60
 pygame.init()
@@ -23,16 +22,11 @@ temporary_display = pygame.display.set_mode(scaled_full)
 bk_n=0
 bk_i=1
 from gameTools import dir_menu
-#presplash_image=pygame.image.load(dir_menu+"lab-presplash.jpg").convert()
 loading_image=[pygame.image.load(dir_menu+"carregando-entrada"+str(n)+".png").convert_alpha() for n in xrange(4)]
-#presplash_pos=presplash_image.get_rect(center=temporary_display.get_rect().center).topleft
-#loading_pos=(loading_image[bk_n].get_rect(center=temporary_display.get_rect().center).topleft[0],presplash_image.get_height()+presplash_pos[1])
-print loading_image[0]
 def loadBlit():
 	global temporary_display,bk_n,bk_i
 	temporary_display.fill((255,255,255))
-	#temporary_display.blit(presplash_image,presplash_pos)
-	temporary_display.blit(loading_image[bk_n],(0,0))#,loading_pos)
+	temporary_display.blit(loading_image[bk_n],(0,0))
 	pygame.display.flip()
 	pygame.time.wait(100)
 	bk_n+=bk_i
@@ -52,11 +46,14 @@ from debugLog import *
 loadBlit()
 from avatarTools import *
 loadBlit()
-from saveSystem import*
-loadBlit()
 from tutorialTools import*
 loadBlit()
 
+if not os.path.exists('data'):
+	os.mkdir('data')
+	print 'Directory data created!'
+else:
+	print 'Directory data already exists.'
 loadBlit()
 
 ####---- ----####
@@ -92,22 +89,15 @@ def scaleGroup(img_list_origin,scale=0.5):
 		img_list[i]=pygame.transform.scale(img_list[i],(int(img_list[i].get_width()*scale),int(img_list[i].get_height()*scale)))
 	return img_list
 
-#inicializacao dos objetos #################################################################
-class renderText(object):
-	def __init__(self,font,text,color,pos,surface_width=None):
-		self.render=font.render(text,True,color)
-		self.pos=(pos[0]+(surface_width//2)-(font.size(text)[0]//2),pos[1]) if surface_width else pos
-	def blitOn(self,display):
-		display.blit(self.render,self.pos)
-scr_pause=screenObject((640,360),FPS,(255,170,150),renderText(dinB_72,"PAUSE",(0,0,0),(0,200),640))
-scr_pause.setTitle("Lab na Via(PAUSE)")
+def clearFile(data_file):
+	opened_file=open(data_file,'wb')
+	opened_file.truncate()
+	opened_file.close()
 
+#inicializacao dos objetos #################################################################
 pause_img =[pygame.image.load(dir_img+'pause.png').convert_alpha(),
 			pygame.image.load(dir_img+'pausePress.png').convert_alpha()]
-'''
-resume_img=[pygame.image.load(dir_img+'resume.png').convert_alpha(),
-			pygame.image.load(dir_img+'resumePress.png').convert_alpha()]
-'''
+
 home_img = [pygame.image.load(dir_img+'home.png').convert_alpha(),
 			pygame.image.load(dir_img+'homePress.png').convert_alpha()]
 
@@ -127,27 +117,19 @@ def centerText(img,font,text,color,pos,h_bool=False):
 	pos_text=(center_pos[0],center_pos[1] if h_bool else pos[1])
 	return [render_text,pos_text]
 
-'''
-pause_button=simpleButton(scr_pause,scaleGroup(pause_img),(640-pause_img[0].get_width(),0))
-resume_button=backButton(scaleGroup(resume_img,1.5),(45,60),centerText(resume_img[0],dinB_22,"RETORNAR",(212,7,21),(45,60-25)))
-home_button=functionButton(None,None,scaleGroup(home_img),(0,200),centerText(resume_img[0],dinB_22,u"INÍCIO",(212,7,21),(245,60-25)))
-retry_button=functionbackButton(None,scaleGroup(retry_img),(0,300),centerText(resume_img[0],dinB_22,"REINICIAR",(212,7,21),(445,60-25)))
-
-scr_pause.addItens(resume_button,retry_button,home_button,retry_button)
-'''
 wheel_img	 = pygame.image.load(dir_menu+'menuPausa0.png').convert_alpha()
 wheel_pos=640-wheel_img.get_width(),wheel_img.get_rect(center=(640,180)).y
 pause_tgscr  = toggleScreen(wheel_img.get_size(),None,(640,wheel_pos[1]),wheel_pos,(-20,0),20,False)
 confirm_bg=pygame.image.load(dir_menu+'telaEntrada-SimNaoTransp.png').convert_alpha()
 confirmation_tgscr = toggleScreen(confirm_bg.get_size(),confirm_bg,((640-confirm_bg.get_width())//2,360),((640-confirm_bg.get_width())//2,(430-confirm_bg.get_height())//2),(0,-40),0,True)
+cartilha_bg=pygame.image.load(dir_menu+'telaCartilhaCiclista.png').convert_alpha()
+cartilha_tgscr = toggleScreen(cartilha_bg.get_size(),cartilha_bg,((640-cartilha_bg.get_width())//2,360),((640-cartilha_bg.get_width())//2,(430-cartilha_bg.get_height())//2),(0,-40),0,True)
 info_tgscr = toggleScreen((640,360),None,(0,64),(0,0),(0,-64),0)
 info_tgscr.turnOn()
 menu_tgscr = toggleScreen((640,360),None,(310,0),(0,0),(-38.75,0),0)
 menu_tgscr.turnOn()
 pause_tgscr.setAngle(180)
-#pause_tgscr.addItens(polygonButton((10,100),[(0,50),(200,50),(50,150),(100,0),(150,150)]))
-#wheel_img	 = pygame.image.load(dir_img+'wheel_pause.png').convert_alpha()
-#wheel_recoil=((wheel_img.get_height()-360)/2)
+
 pause_button=toggleFunctionButton(pause_tgscr.turnOn,None,scaleGroup(pause_img),(640-(scaleGroup(pause_img)[0].get_width()*1.5),scaleGroup(pause_img)[0].get_height()*0.5))
 pause_button.inflateButton( 30,30 )
 button_ident=((360-150)/4)+50
@@ -174,7 +156,7 @@ class turnOffScreen(object):
 		if self.actived==2:self.scr.turned_on=False
 
 
-pause_tgscr.addItens(resume_button,home_button,retry_button )#,turnOffScreen(pause_tgscr))
+pause_tgscr.addItens(resume_button,home_button,retry_button )
 
 win_img=pygame.image.load(dir_menu+"tela_TabuaVenceu.png").convert_alpha()
 lose_img=pygame.image.load(dir_menu+"tela_TabuaPerdeu.png").convert_alpha()
@@ -202,13 +184,6 @@ scr_score=toggleScreen(rank_img.get_size(),rank_img,(455,-rank_img.get_height())
 scr_win.addItens(home_button_2,retry_button_2,stages_button)
 scr_lose.addItens(home_button_2,retry_button_2,stages_button)
 
-#scr_win=screenObject((640,360),60,(200,255,200),home_button,renderText(dinB_72,u"Você venceu!",(0,0,0),(0,200),640 ) )
-#scr_win.setTitle("Lab na Via - WIN")
-#scr_lose=screenObject((640,360),60,(255,200,200),home_button,renderText(dinB_72,u"Você perdeu!",(0,0,0),(0,200),640 ))
-#scr_lose.setTitle("Lab na Via - LOSE")
-
-
-#new_biker_img=pygame.image.load(dir_img+'new_sprite2.png').convert_alpha()
 biker_img=pygame.image.load(dir_img+'ciclista.png').convert_alpha()
 bikerFront_img=pygame.image.load(dir_img+'ciclistaDeFrente.png').convert_alpha()
 b_width=biker_img.get_width()
@@ -337,28 +312,12 @@ dog_list_3=[
 980
 ]
 
-'''
-passerbyObject((x-biker_img.get_width(),0-biker_img.get_height()),biker_img,0,0,(x-249)*10) for x in xrange(249,320,1)
-]+[
-passerbyObject((x,0-bikerFront_img.get_height()),bikerFront_img,0,0,-(x-395)*10) for x in xrange(396,320,-1)
-]
-'''
 sign_img=['placaLab.png','placaPref.png','placaGestao.png','placaSPAberta.png','placaSPCultura.png','placa00.png']
 sign_list=[ pygame.image.load(dir_img+placa).convert_alpha() for placa in sign_img]
 
 
 fundo_inicio=pygame.image.load(dir_menu+'bg_menu.png').convert()
-#roda_inicio=pygame.image.load(dir_img+'roda1.png').convert_alpha()
-'''
-red_button=scaleGroup([pygame.image.load(dir_img+'botaoSimples.png').convert_alpha(),
-						   pygame.image.load(dir_img+'botaoClicado.png').convert_alpha()],
-						   0.5)
 
-grid_menu=[]
-grid_pos=[640-red_button[0].get_width()-16,0]#18]#[480,120]
-grid_ident=19
-grid_color=(244,235,76)
-'''
 back_button_img=[pygame.image.load(dir_img+"back_button.png").convert_alpha(),pygame.image.load(dir_img+"back_buttonOn.png").convert_alpha()]
 inviButton=[pygame.Surface((32,32),SRCALPHA,32)]
 avatarBorda=pygame.image.load(dir_img+"avatarBorda.png").convert_alpha()
@@ -370,6 +329,9 @@ button_img_yes=[pygame.image.load(dir_menu+'button_yes'+str(n)+'.png').convert_a
 confirmation_tgscr.addItens(functionButton(lambda : [confirmation_tgscr.turnOn(False),menu_tgscr.turnOn(),info_tgscr.turnOn()],None,button_img_no,(confirm_bg.get_width()-button_img_no[0].get_width()-50,145) ),
 							functionButton(scr_start.closeGame,None,button_img_yes,(50,145) )
 							)
+cartilha_tgscr.addItens(functionButton(lambda : [cartilha_tgscr.turnOn(False),menu_tgscr.turnOn(),info_tgscr.turnOn()],None,button_img_no,(confirm_bg.get_width()-button_img_no[0].get_width()-50,178) ),
+							urlButton("http://www.issuu.com/cetsp/docs/CartilhaDoCiclista",button_img_yes,(50,178) )
+							)
 home_back_button=functionButton(lambda:[tuto_tgscr.turnOn(False),stages_tgscr.turnOn(False),options_tgscr.turnOn(False),delete_tgscr.turnOn(False)],scr_start,back_button_img,backb_pos)
 #home_from_options=functionButton(lambda:[options_tgscr.turnOn(False),delete_tgscr.turnOn(False)],scr_start,back_button_img,backb_pos)
 clear_back_button=backButton(back_button_img,backb_pos,None,True)
@@ -378,30 +340,12 @@ clear_back_button.inflateButton(70,70)
 home_back_button.inflateButton(70,70)
 onOffButton=[pygame.image.load(dir_img+"onOff"+str(x)+".png").convert_alpha()for x in xrange(3)]
 
-
-#slides=[scaleGroup([pygame.image.load(dir_img+'tuto'+str(i+1)+'.png').convert()],0.8) for i in range(3)]
-
-#slides=[[pygame.image.load(dir_img+'tuto'+str(i+1)+'.png').convert()] for i in range(3)]
-
-#rect_slide=slides[0][0].get_rect()
-#rect_slide.center=pygame.Rect(0,0,640,360).center
-#tutorial_slide=slideButton(slides,(rect_slide.x,0))
-
-#tutorial_slide=slideButton(slides,(0,0))
-
-#scr_gps=screenObject((640,360),FPS,(70,80,90),simpleButton([pygame.image.load(dir_img+"pontos culturais.png").convert_alpha()],(0,0)) )
-
-#scr_options=screenObject((640,360),FPS,(0,100,100))
-
-
 scr_gps=screenObject((640,360),FPS,bg_all)
-
 
 options_tgscr=toggleScreen((640,360),None,(0,0),(640,0),(64,0))
 options_tgscr.hideTurnedOff(False)
 scr_options=screenObject((640,360),FPS,bg_all,options_tgscr)
 
-#if android:
 mute=functionButton(lambda:[setMuteMusic(True),mixer.music.stop()],None,[onOffButton[1],onOffButton[2]],(400,200),None)
 unmute=functionButton(lambda:[setMuteMusic(False),mixer.music.play()],None,[onOffButton[0],onOffButton[2]],(400,200),None)
 mute_unmute=buttonList(mute,unmute)
@@ -435,7 +379,7 @@ for scr in [scr_avatar,scr_about,scr_tutorial]:
 
 
 try:
-	arq=open(dir_data+"tuto_data.lab","rb")
+	arq=open("tuto_data.plab","rb")
 	first_time_tutorial=cPickle.load(arq)
 	arq.close()
 except:
@@ -443,7 +387,7 @@ except:
 
 def setFirstTime(boolean=True):
 	global first_time_tutorial
-	arq=open(dir_data+"tuto_data.lab","wb")
+	arq=open("tuto_data.plab","wb")
 	if boolean:
 		arq.truncate()
 		first_time_tutorial=True
@@ -460,7 +404,7 @@ stages_tgscr=toggleScreen((640,360),None,(0,0),(640,0),(64,0))
 scr_stages.setEscFunction(lambda : [home_back_button.callActivation() if not tuto_tgscr.turned_on else [tuto_tgscr.turnOn(False),stages_tgscr.turnOn(False)]])
 scr_gps.setEscFunction(clear_back_button.callActivation)
 scr_options.setEscFunction(lambda:[options_tgscr.turnOn(False),delete_tgscr.turnOn(False)] if delete_tgscr.turned_on else home_back_button.callActivation())
-scr_start.setEscFunction(lambda: [confirmation_tgscr.toggleOnOff(),menu_tgscr.toggleOnOff(),info_tgscr.toggleOnOff()])
+scr_start.setEscFunction(lambda: [ cartilha_tgscr.turnOn(False) if cartilha_tgscr.turned_on else confirmation_tgscr.toggleOnOff(),menu_tgscr.toggleOnOff(),info_tgscr.toggleOnOff()])
 if basic_debug:
 	scr_gps.setTitle("Lab na Via - GPS")
 	scr_avatar.setTitle("Lab na Via - Avatar")
@@ -494,10 +438,6 @@ scr_avatar.addItens(avatar_tools,skin_tgscr)#,color_confirm)#,*skin_buttons)
 
 limpar_button=[pygame.image.load(dir_img+'limpar'+str(x)+'.png').convert_alpha()for x in xrange(2)]
 
-#if android:
-
-#else:
-#	scr_options.addItens(functionButton(lambda:[avatar_tools.clearSave(),clearFile(dir_data+"config_data.lab")],None,red_button,(100,250),centerText(red_button[0],dinB_12,"Apagar Dados Salvos",(255,255,255),(100,250),True)))
 class radioList(object):
 	def __init__(self,buttons):
 		self.buttons=buttons
@@ -526,31 +466,13 @@ avatar_tools.preEvents()
 avatar_buttons[0].callActivation()
 
 #AVATAR PERSONAGENS:
-'''
-def makeButton(avatar,size=(100,100)):
-	rect=avatar.get_rect()
-	rect.width=rect.width/3
-	button=[]
-	for rb in red_button:
-		button.append(pygame.transform.scale(rb,size))
-	for bt in button:
-		bt.blit(pygame.transform.scale(avatar.subsurface(rect),size),(0,0))
-	return button
-avatar=[pygame.image.load(dir_img+"avatar"+str(x)+".png").convert_alpha() for x in range(22)]
-avatares=[functionButton(player.setImg,None,makeButton(avatar[x],(50,100)),(15,15),None,None,avatar[x]) for x in range(22)]
 
-for a in range(len(avatares)):
-	avatares[a].pos=(
-					15+((15+50)*a)-((((15+50)*7)*int(a/7))),
-					15+(115*int(a/7)) 
-					)
-	scr_avatar.addItens(avatares[a])
-'''
 gps_item=None
 loadBlit()
 if android:
 	brake_img=[pygame.image.load(dir_img+'brakeN.png').convert_alpha(),pygame.image.load(dir_img+'brakeC.png').convert_alpha()]
 	move_img=[pygame.image.load(dir_img+'botaoTeste.png').convert_alpha()]#scaleGroup([])[0]  Agora isso tá lá em cima nos avatares
+	
 	right_button=toggleFunctionButton(
 		lambda: player.playerAccel(+1), 							#click_function
 		None,														#link
@@ -560,17 +482,15 @@ if android:
 		lambda: player.playerMove(+1))								#press_function
 
 	left_button=toggleFunctionButton(lambda: player.playerAccel(-1),None,[pygame.transform.flip(move,True,False) for move in move_img],(32,360-move_img[0].get_height()-32),None,lambda: player.playerMove(-1))
-	right_button.inflateButton(128,128)
-	left_button.inflateButton(128,128)
-	brake_button=toggleFunctionButton(lambda: player.playerBrake(0.5),None,brake_img,(160,360-brake_img[0].get_height()),None,lambda: player.playerBrake(8))
+	right_button.inflateButton(128,55)
+	left_button.inflateButton(128,55)
+	brake_button=toggleFunctionButton(lambda: [player.playerBrake(0.5),left_button.callActivation(False),right_button.callActivation(False)],None,brake_img,(160,360-brake_img[0].get_height()),None,lambda: player.playerBrake(8))
 	brake_button.inflateButton(0,100)
+	
 	from jnius import *
-	#from buscarSpaceEvent import *
 	from geo import*
-	lastUpdateText = simpleWhiteText(u"Última Atualização:", (30,180),chic_22)
-	lastUpdateTime = simpleWhiteText(u"-", (30,210),chic_16)
-	#copen_url = autoclass("com.lab.labnavia.OpenURL")
-	#open_url = copen_url()
+	lastUpdateText = renderText(chic_22,u"Última Atualização:", (255,255,255),(30,180))
+	lastUpdateTime = renderText(chic_16,u"-", (255,255,255),(30,210))
 	atualizar_button=[pygame.image.load(dir_img+'int-CultbtnAtualizaOff.png').convert_alpha(),
 						   pygame.image.load(dir_img+'int-CultbtnAtualizaOn.png').convert_alpha()]
 						   
@@ -599,28 +519,19 @@ if android:
 			print self.auto
 		def preEvents(self):
 			self.posEvents()
-			#pygame.time.set_timer(USEREVENT+6,1500)
-			#self.loading=True
 		def posEvents(self):
 			pygame.time.set_timer(USEREVENT+6,0)
 			self.loading=False
 		def getLocation(self):
 			loc=self.gps_hardware.location
 			return (loc.longitude,loc.latitude,1500)
-
 		def setLastUpdate(self):
 			try:
 				global lastUpdateTime
-				if self.parentScreen.hasItem(lastUpdateTime):
-					self.parentScreen.delItem(lastUpdateTime) 			
-			
 				timeStr = time.strftime("%d/%m/%y - %H:%M", time.localtime())
-				lastUpdateTime = simpleWhiteText(timeStr, lastUpdateTime.pos ,lastUpdateTime.font)
-				self.parentScreen.addItens(lastUpdateTime)
+				lastUpdateTime.setNewText(timeStr)
 			except Exception as ex:
-				print ex
-
-				
+				print "setLastUpdate Error:\n\t"+str(ex)				
 		def update(self):
 									
 			loc=self.gps_hardware.location
@@ -628,16 +539,9 @@ if android:
 			if self.lnglat[0]!=0.0 and self.lnglat[1]!=0.0:
 				debugGps('localização válida')
 				self.finder.run(self.lnglat)
-				'''
-				try:self.finder.run(self.lnglat)
-				except Exception,e:print e
-				'''
 				dict_locals=self.finder.getLocals()
 				distances=self.finder.getDistances()
 				dict_events=self.finder.getEvents()
-				#surface.fill((1,2,3))
-				#surface.set_colorkey((1,2,3))
-				#surface=AAfilledRoundedRect(surface,surface.get_rect(),(50,100,100),0.5)
 				box_list=[]
 				linkSpace=[]
 				linkEvent=[]
@@ -656,10 +560,7 @@ if android:
 				num_elements = len(dict_locals)
 				for i in range(num_elements):
 					text_1=textBox(unicode(dict_locals[i]['name']),dinB_16,330-((20+15+25)*2),(255,255,255))
-					text_2=textBox(u'\nDistância : '+unicode(int(distances[i]))+' metros'
-								   #+'\nLatitude  : '+unicode(dict_locals[i]['location']['latitude'])
-								   #+'\nLongitude : '+unicode(dict_locals[i]['location']['longitude'])
-								   ,dinL_12,330-((52+15)*2),(255,255,255))
+					text_2=textBox(u'\nDistância : '+unicode(int(distances[i]))+' metros',dinL_12,330-((52+15)*2),(255,255,255))
 					surf_h=text_1.get_height()+text_2.get_height()+30
 					surface=pygame.Surface((330,surf_h if surf_h>70 else 70))
 					surface.fill((9,78,129))
@@ -671,7 +572,7 @@ if android:
 						separator.fill((9,90,148))
 						surface.blit(separator, (0, surface.get_height()-5))
 
-					pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]# if i>0 else 15				
+					pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]
 					box_list.append((
 										simpleImage(surface, (15, pos)),										
 										urlButton(
@@ -704,7 +605,7 @@ if android:
 						separator.fill((9,90,148))
 						surface.blit(separator, (0, surface.get_height()-5))
 					
-					pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]# if i>0 else 15
+					pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]
 					box_list.append(
 										(
 										simpleImage(surface,(15,pos) ),
@@ -725,7 +626,6 @@ if android:
 				debugGps('definindo novo tamanho do display')
 				size=( self.screen.display.get_width(),box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]+15 )
 				self.screen.display=pygame.Surface(size)
-				#print unicode(self.text)
 				debugGps('seting_timer')
 				pygame.time.set_timer(USEREVENT+6,120000 if self.auto else 0)
 				debugGps('loading=false')
@@ -744,42 +644,29 @@ if android:
 			if event.type==USEREVENT+6:
 				self.loadUpdate()
 		def blitOn(self,display):
-			#display.blit(dinB_16.render("latitude:  "+str(self.lnglat[1]),True,(255,255,255)),(0,328))
-			#display.blit(dinB_16.render("longitude: "+str(self.lnglat[0]),True,(255,255,255)),(0,344))
 			if self.loading: 
 				text_render=dinBd_32.render("CARREGANDO . . .",True,(255,255,0))
 				text_rect=text_render.get_rect()
 				text_rect.center=display.get_rect().center
 				display.blit(text_render,text_rect.topleft)
 				self.update()
-	#'''
 	loadBlit()
 	inner_screen=innerScreen((330,600),(0,0),None)
 	outer_screen=innerScreen((440,360),(300,0),None,
 		inner_screen,
-		innerScroller(inner_screen,10,1,(9,90,148),(9,78,129))#(0,150,0),(0,250,0))
+		innerScroller(inner_screen,10,1,(9,90,148),(9,78,129))
 	)	
 		
 	gps_item=verificadorGPS(inner_screen, scr_gps)
 	alerta=textBox(u"Este mecanismo necessita acesso\nao GPS e à Internet do seu celular",chic_14,320,(255,255,255))
 	scr_gps.addItens(simpleImage(alerta,(33,310)))
-	#TODO
-	'''
-	auto=checkButton(gps_item.toggleAuto,None,[red_button,red_button],(220+red_button[0].get_width(),back_button.pos[1]),
-		[centerText(red_button[0],dinB_12,u'Ligar Automático',grid_color,(220+red_button[0].get_width(),back_button.pos[1]),True),
-		 centerText(red_button[0],dinB_12,u'Ligar Manual',grid_color,(220+red_button[0].get_width(),back_button.pos[1]),True)
-		] )
-	'''
 	
 	scr_gps.addItens(outer_screen,
 		gps_item,
 		lastUpdateText,
 		lastUpdateTime,
 		functionButton(gps_item.update,None,atualizar_button,(25,250))
-		#,auto#functionButton(gps_item.toggleAuto,None,red_button,(220+red_button[0].get_width(),back_button.pos[1]),centerText(red_button[0],dinB_22,u'Automático',grid_color,(220+red_button[0].get_width(),back_button.pos[1]),True) )
 		)
-	#'''
-	#scr_gps.addItens(localCulture() )	
 	
 ###########---------------------------FASES---------------------------###########
 stage_01=gameObject(
@@ -870,7 +757,8 @@ if android: scr_stage_03.addItens(right_button,left_button,brake_button)
 scr_stage_03.setTitle("Lab na Via")
 scr_stage_03.showFps()
 for scr in [scr_stage_01,scr_stage_02,scr_stage_03]:
-	scr.setEscFunction(pause_button.callActivation)
+	#hardcode no primeiro if do lambda
+	scr.setEscFunction(lambda: [[stages_button.callActivation()] if stage_01.end_game or stage_02.end_game or stage_03.end_game else [resume_button.callActivation() if pause_tgscr.turned_on else pause_button.callActivation()]] )
 
 
 stages_buttons=[
@@ -879,15 +767,10 @@ stages_buttons=[
 	linkButton(scr,[pygame.image.load(dir_menu+"stage"+str(s+1)+"_"+str(x)+".png").convert_alpha() for x in xrange(2)],[220*(s+1),100] )
 	for s,scr in enumerate([scr_stage_02,scr_stage_03])
 ]
-	#red_button,(100,100),centerText(red_button[0],dinB_22,"FASE 1",(0,0,0),(100,100),True)),
-	#linkButton(scr_stage_02,)#red_button,(200,200),centerText(red_button[0],dinB_22,"FASE 2",(0,0,0),(200,200),True)),
-	#linkButton(scr_stage_03,)#red_button,(300,300),centerText(red_button[0],dinB_22,"FASE 3",(0,0,0),(300,300),True))
-
 
 for b in xrange(1,3,1):
 	stages_buttons[b].setHide(True)
 	stages_buttons[b].setLock(True)
-
 
 try:
 	load_stages=open(dir_data+"stages_data.lab","rb")
@@ -899,23 +782,10 @@ for stage in [stage_01,stage_02,stage_03]:
 	stage.loadScore()
 
 
-
-#selection_surface=pygame.Surface((1,1))#((red_button[0].get_width()+10,red_button[0].get_height()+10 ))
-#selection_surface.fill((255,255,0))
-'''
-#escrevi desse jeito pois funciona por linhas e não colunas
-options_matrix=[
-[scr_stage_01],
-[scr_options],
-[scr_tutorial],
-[scr_about]
-]
-selection=gradeSelection(options_matrix,selection_surface,(grid_menu[0][0]-5,grid_menu[0][1]-5),(100,red_button[0].get_height()+grid_ident),(0,3),(0,0))#,(False,True))
-'''
 stages_tgscr.addItens(*[simpleImage(pygame.image.load(dir_menu+"stage"+str(s)+"_2.png").convert_alpha(),(220*s,100) ) for s in xrange(1,3,1)]+stages_buttons)
 stages_tgscr.hideTurnedOff(False)
 scr_stages.addItens(stages_tgscr,tuto_tgscr)
-#red_button2=scaleGroup(red_button,2)
+
 scr_and_text=[
 			  (scr_stages,u'Jogar')
 			  ,(scr_avatar,u'Avatar')
@@ -924,33 +794,11 @@ scr_and_text=[
 			  ,(scr_tutorial,u'Tutorial')
 			  ,(scr_about,u'Sobre')
 			  ]
-'''
-grid_ident=(360-len(scr_and_text)*red_button[0].get_height())/(len(scr_and_text)+1)#19
 
-for i in range(len(scr_and_text)):
-	grid_menu.append( ( grid_pos[0],grid_pos[1]+((red_button[0].get_height()*i)+(grid_ident*(i+1))) ) )
-'''
-#buttons_list=[linkButton(scr_and_text[i][0],red_button,grid_menu[i],centerText(red_button[0],dinB_22,scr_and_text[i][1],grid_color,grid_menu[i],True) ) for i in range(len(grid_menu)) ]
 loadBlit()
 if not android:
 	culture_url="http://spcultura.prefeitura.sp.gov.br/busca/##(global:(enabled:(event:!t,space:!t),filterEntity:event))"
-	#buttons_list[3]=urlButton(culture_url, red_button, grid_menu[3],
-	#centerText(red_button[0],dinB_22,u"Cultura",grid_color,grid_menu[3],True) )#Tem que ficar na prosição do Cultura
 
-'''
->>>>>>> c3de12a04102f1922d7ce9bfce860509125b708e
-pos_ini=-roda_inicio.get_width()*2
-pos_fin=roda_inicio.get_width()//2
-y_roda=-roda_inicio.get_width()//1.7
-
-#movimento=angulo*3.14*raio/360
-rot_roda=-2.5
-mov_roda=(-rot_roda*3.14*pos_fin/360,0)#(5,0)
-
-pop_up_01=popUp((-250,100),(0,100),(10,0),pygame.Surface((250,50)),(10,10))
-'''
-
-#selection=iFreeSelection(buttons_list,selection_surface,10)
 class idleBikers(object):
 	def __init__(self, min_time,max_time,event,imgs,moves):
 		self.min_time=min_time
@@ -1002,6 +850,8 @@ class idleBikers(object):
 menu_tgscr.addItens(geniusButton((142,134),60,120,[pygame.image.load(dir_menu+'menu'+str(x)+'.png').convert_alpha() for x in range(6)],(335,47),[scr_gps if android else culture_url,scr_avatar,scr_options,scr_tutorial,scr_stages],[mixer.Sound(dir_sound+"buttonSound.mp3"),0] ))#(0,0)=(335,47)
 info_tgscr.addItens(linkButton(scr_about,[pygame.image.load(dir_menu+'sobre'+str(x)+'.png').convert_alpha() for x in range(2)],(16,296)))#(0,0)=(16,296)
 loadBlit()
+pygame.time.set_timer(USEREVENT+2,400)
+c_ciclista_animation=animatedSprite(pygame.image.load(dir_img+"cciclista_off.png").convert_alpha(),pygame.Rect(0,0,70,70),(0,0),USEREVENT+2)
 scr_start.addItens( 
 						idleBikers(500,5000,USEREVENT+6,
 							[[pygame.image.load(dir_bikers+"biker"+str(x)+str(y)+".png").convert_alpha() for y in xrange(1,-1,-1)]for x in xrange(3)],
@@ -1018,34 +868,14 @@ scr_start.addItens(
 							[[ [(640,60),(-1,0.33)]
 							, [(200,300),(1,-0.33)]
 							, [(640,60)]]]),
-						#movingButton(None,[roda_inicio],(pos_ini,y_roda),(pos_fin,y_roda),mov_roda,rot_roda), LAGLAGLAGLAGLAGLAGLAGLAGLAGLAG
-						#movingButton(None,[roda_inicio],(-pos_fin,y_roda),(-pos_ini,y_roda),mov_roda,rot_roda), LAGLAGLALGLAGLAGLALGLAGLAGLAG
-						#textButton(red_button,(110,110),(120,120),dinB_12),
-						#polygonButton((200,10),[(0,50),(50,150),(200,50),(100,0),(150,150)]),
-						#arcButton((100,100),0,100,pygame.Rect(0,0,100,100)),
-						
-						#selection,
-						#buttons_list[0],buttons_list[1],buttons_list[2],buttons_list[3],
-#						pop_up_01,
-#						popUpTimer(60000,pop_up_01.callPopup,1000,dinB_22.render('Champlix Champlow',True,(0,255,0))),
-#						movableScreen(50,(K_LEFT,K_RIGHT,K_DOWN,K_UP),(400,400),(10,10),(100,100,100),
-#							linkButton(scr_stage_01,red_button,(0,0),centerText(red_button[0],dinB_22,u'Jogar',grid_color,(0,0),True) ),
-#							movableScreen(50,(K_a,K_d,K_s,K_w),(300,300),(100,100),(0,255,0),
-#								linkButton(scr_stage_01,red_button,(60,60),centerText(red_button[0],dinB_22,u'Jogar',grid_color,(60,60),True)),
-#								innerScreen((200,200),(100,100),roda_inicio,
-#									linkButton(scr_stage_01,red_button,(0,0),centerText(red_button[0],dinB_22,u'Jogar',grid_color,(0,0),True))
-#									)
-#								)
-#							),
+						functionButton(lambda:[cartilha_tgscr.turnOn(),info_tgscr.turnOn(False),menu_tgscr.turnOn(False),confirmation_tgscr.turnOn(False)],None,[c_ciclista_animation,pygame.image.load(dir_img+"cciclista_on.png").convert_alpha()], (100,289)),
 						extraControls(),
 						info_tgscr,
 						menu_tgscr,
-						confirmation_tgscr )
-## Tutorial
-#imagem template
-#temp_tutorial_img=pygame.image.load(dir_img+"int_BarSuperiorTutorial.png").convert_alpha()
-#screenshots
-		#colocar a do início
+						confirmation_tgscr,
+						cartilha_tgscr )
+
+#tutorial
 screenshot_0=pygame.image.load(dir_img+"tuto0.png").convert()
 screenshot_1=pygame.image.load(dir_img+"tuto1.png").convert()
 screenshot_2=pygame.image.load(dir_img+"tuto2.png").convert()
@@ -1060,8 +890,6 @@ mao_icone_baixo=pygame.image.load(dir_img+"maoBaixo.png").convert_alpha()
 mao_icone_cima=pygame.image.load(dir_img+"maoCima.png").convert_alpha()
 ponteiro=pygame.image.load(dir_img+"ponteiro.png").convert_alpha()
 ponteiro_cima=pygame.transform.flip(ponteiro,False,True)
-#mao_icone_direita=pygame.image.load(dir_img+"maoDireita.png").convert_alpha()
-#mao_icone_esquerda=pygame.image.load(dir_img+"maoEsquerda.png").convert_alpha()
 
 lista_de_fases=[tutorialFases(u"Início",pygame.Rect(220,110,200,60), screenshot_0,mao_icone_cima,(290,140)),
 				tutorialFases(u"Toque alternadamente as setas para pedalar",pygame.Rect(32,258,50,70), screenshot_1,mao_icone_baixo,(32,200)),
@@ -1108,7 +936,6 @@ scr_stages.setMusic(dir_music+'menuLoop.mp3')
 scr_stage_01.setMusic(dir_music+'gameplayLoop.mp3',True)
 scr_stage_02.setMusic(dir_music+'Jaunty Gumption.mp3',True)
 scr_stage_03.setMusic(dir_music+'In a Heartbeat.mp3',True)
-#for button in buttons_list: scr_start.addItens(button)
 loadBlit()
 scr_tutorial.addItens(simpleImage(scr_tutorial_headline,(0,0)))
 scr_options.addItens(simpleImage(scr_options_headline,(0,0)))
@@ -1118,36 +945,20 @@ scr_stages.addItens(simpleImage(scr_stages_headline,(0,0)))
 
 delete_img=pygame.image.load(dir_menu+'telaLimpar-SimNaoTransp.png').convert_alpha()
 delete_tgscr=toggleScreen(delete_img.get_size(),delete_img,((640-delete_img.get_width())//2,360),((640-delete_img.get_width())//2,(430-delete_img.get_height())/2),(0,-36))
-delete_tgscr.addItens(functionButton(lambda:[avatar_tools.clearSave(),avatar_buttons[0].callActivation(),color_picker.resetColor(),clearFile(dir_data+"config_data.lab"),mute_unmute.setState(0),gpsingame_onoff.setState(0),options_tgscr.turnOn(False),delete_tgscr.turnOn(False),setFirstTime(),stages_buttons[0].setLink(None)]+[scr.clearScore() for scr in [stage_01,stage_02,stage_03]],None,button_img_yes,(50,165),None),
+delete_tgscr.addItens(functionButton(lambda:[avatar_tools.clearSave(),avatar_buttons[0].callActivation(),color_picker.resetColor(),clearFile(dir_data+"config_data.lab"),mute_unmute.setState(1),gpsingame_onoff.setState(1),mute_unmute.callActivation(),gpsingame_onoff.callActivation(),options_tgscr.turnOn(False),delete_tgscr.turnOn(False),setFirstTime(),stages_buttons[0].setLink(None)]+[scr.clearScore() for scr in [stage_01,stage_02,stage_03]],None,button_img_yes,(50,165),None),
 						functionButton(lambda:[options_tgscr.turnOn(False),delete_tgscr.turnOn(False)],None,button_img_no,(delete_img.get_width()-button_img_no[0].get_width()-50,165),None))
 scr_options.addItens(delete_tgscr)
-options_tgscr.addItens(simpleWhiteText("Placas Culturais:", (100,150),chic_30), simpleWhiteText(u"Recurso Música:", (100,200),chic_30), simpleWhiteText("Dados Salvos:", (100,250),chic_30),
+options_tgscr.addItens(renderText(chic_30,"Placas Culturais:",(255,255,255), (100,150)), renderText(chic_30,u"Recurso Música:",(255,255,255), (100,200)), renderText(chic_30,"Dados Salvos:",(255,255,255), (100,250)),
 						gpsingame_onoff,mute_unmute,
 						functionButton(lambda: [options_tgscr.turnOn(),delete_tgscr.turnOn()],None,limpar_button,(400,250),None))
-'''
-scr_avatar=screenObject((640,360),60,(0,0,100))
-scr_score=screenObject((640,360),60,(100,0,0))
-scr_card=screenObject((640,360),60,(0,100,0))
-buttons_options=[
-	back_button,
-	linkButton(scr_avatar,red_button,(100,50),centerText(red_button[0],dinB_22,u'Avatar',grid_color,(100,50),True)),
-	linkButton(scr_score,red_button,(150,150),centerText(red_button[0],dinB_22,u'High Score',grid_color,(150,150),True)),
-	linkButton(scr_card,red_button,(50,300),centerText(red_button[0],dinB_22,u'CardÁrvore',grid_color,(50,300),True))
-	]
-scr_options.addItens(iFreeSelection(buttons_options,selection_surface,10))
-for button in buttons_options: scr_options.addItens(button)
-'''
+
 scr_stages.addItens(home_back_button)
 scr_options.addItens(home_back_button)
 scr_tutorial.addItens(back_button)
 scr_about.addItens(back_button)
 scr_avatar.addItens(back_button)
 scr_gps.addItens(clear_back_button)
-'''
-scr_avatar.addItens(back_button)
-scr_score.addItens(back_button)
-scr_card.addItens(back_button)
-'''
+
 scr_start.setTitle("Lab na Via")
 
 home_button.link=scr_start
@@ -1160,12 +971,6 @@ wheel_buttons=pauseButtons((0,0),(resume_button,home_button,culture_button,retry
 pause_tgscr.addItens(culture_button,wheel_buttons)
 
 
-'''
-texto_1=textBox("Fernando\n \nChamplow,\tChamplix\nhall alala lalala lalala lalalalalalalalalalalalala\nHalala\nhalalalalalalalalalalalal\n \n--\n \nBom dia.",dinB_16,200)
-scr_options.addItens(simpleImage(texto_1,(300,0)))
-scr_options.addItens(simpleImage(texto_2,(300,texto_1.get_height() )))
-scr_options.addItens(simpleImage(textBox("1.",dinB_16,200),(280,0)))
-'''
 ############################################################################################
 
 ###---Descomente estas linhas para começar em FULLSCREEN---###
@@ -1176,7 +981,6 @@ scr_start.setNewSizeScale(scaled_full)#;scr_start.setFullscreen()
 loadBlit()
 def main():
 	initTools()
-	#if android:
 	try:
 		load_file=open(dir_data+"config_data.lab","rb")
 		gpsingame_onoff.state=cPickle.load(load_file)
@@ -1187,7 +991,6 @@ def main():
 	except Exception,e:
 		print "load_file\n\t"+str(e)
 	screenLoop(scr_start)
-	#if android:
 	load_file=open(dir_data+"config_data.lab","wb")
 	try:
 		cPickle.dump(gpsingame_onoff.state,load_file)

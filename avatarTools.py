@@ -12,7 +12,6 @@ class avatarTools(object):
 		self.skin=pygame.image.load(dir_avatar+'skinN.png').convert_alpha()
 		self.skin_color=(0,0,0)
 		self.avatar=[
-					#[0,[pygame.Surface((1,1))]],#skin],
 					[0,shoes],
 					[0,pants],
 					[0,shirt],
@@ -61,7 +60,6 @@ class avatarTools(object):
 		new_avatar.blit(colorizeFull(self.skin,self.skin_color).convert_alpha(),(0,0))
 		for item in self.avatar:
 			new_avatar.blit(item[1][item[0]][0] , (0,0))
-		#new_avatar.blit(pygame.Surface((100,50)),(0,0),special_flags=(pygame.BLEND_RGBA_SUB))
 		self.player.setImg(new_avatar)
 	def focusAvatar(self,av):
 		self.focus_avatar=av
@@ -92,7 +90,7 @@ class avatarTools(object):
 	def blitOn(self,display):
 		global font
 		if font:
-			pos_center=(#320,330)#o meio da tela, mas precisa mudar a posição das setas
+			pos_center=(
 						((250+50)/2)#metade da (distancia entre as setas, mais a largura da segunda)
 						+220#mais a posição em x da primeira
 						,330)

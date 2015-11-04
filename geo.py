@@ -43,20 +43,12 @@ class findUrl(object):
 		self.distances=[]
 		self.distM=[]
 		self.text=''
-		#self.eventsFromMaps=[]
 	def run(self,latlng):
-		print '1'
 		self.latlng=latlng
-		print '2'
-		#'''
 		self.putParams()
-		print '3'
 		self.calcLocalDistance()
-		print '4'
 		self.putUrl()
-		print '5'
 		self.listUrl()
-		print '6'
 	def runText(self,latlng):
 		self.putParams()
 		self.calcLocalDistance()
@@ -69,7 +61,6 @@ class findUrl(object):
 		
 		self.completeUrl=self.url[0]+self.params+self.url[1]
 		self.completeUrl=self.completeUrl+str(self.latlng)
-		#return self.completeUrl
 	
 	def putUrl(self):
 		url_instance=urllib.urlopen(self.completeUrl)
@@ -92,7 +83,6 @@ class findUrl(object):
 		print 'listUrl()'
 		spaceId = []
 
-		#spaceIdStr = "EQ("+str(self.url_list[0]["id"])+"),"#o lance da virgula e tal
 		spaceIdStr = ""
 		print '1º for'
 		for i in range (0, len(self.url_list)):
@@ -100,12 +90,10 @@ class findUrl(object):
 		
 		spaceIdStr = spaceIdStr[:-1]#depois ele come a ultima virgula
 		
-		#now = datetime.now()
-		dateNow = str(date.today())# str(now.year)+"-"+str(now.month)+"-"+str(now.day)
+		dateNow = str(date.today())
 		print dateNow
 		dateLimit = str(date.fromordinal(date.today().toordinal()+30))
 		print dateLimit
-		#dateLimit = str(now.year)+"-"+str(now.month)+"-"+str(now.day)
 
 		url_debug="http://spcultura.prefeitura.sp.gov.br/api/eventoccurrence/find?@select=id, eventId, startson,spaceId&_startsOn=AND(GT("+dateNow+"), LT("+dateLimit+"))&spaceId=OR("+spaceIdStr+")"
 		print url_debug
@@ -118,7 +106,6 @@ class findUrl(object):
 
 		eventOccJson_list = json.loads(eventOcc_str)
 		
-		#eventIdStr = "EQ("+str(eventOccJson_list[0]["eventId"])+"),"#lance de virgula
 		eventIdStr = ""
 		print '2º for'
 		for i in range (0, len(eventOccJson_list)):
@@ -128,7 +115,6 @@ class findUrl(object):
 		
 		try:url_debug_2="http://spcultura.prefeitura.sp.gov.br/api/event/find?@select=id,%20name&@order=id%20ASC&id=OR("+eventIdStr+")"
 		except Exception,e:print e
-		#print url_debug_2
 		print '2º acesso ao spcultura'
 		paginaEvent = urllib.urlopen(url_debug_2)
 		print 'lendo...'
@@ -144,13 +130,9 @@ class findUrl(object):
 		'''
 		for i in range(0,len(self.url_list)):
 			for arg in self.args:
-				#self.text+= '\n'+str(arg)+":"
 				self.text+= '\n'+unicode(self.url_list[i][arg])
 			self.localsFromMaps.append(self.url_list[i])
 			self.text+= "\n-----------------------------------------"
-		
-		#self.text+= "O que foi achado:"+str(self.localsFromMaps)
-		#return self.localsFromMaps
 		
 		spaceId = []
 		'''
@@ -159,8 +141,6 @@ class findUrl(object):
 		for i in range (0, len(self.url_list)):
 			spaceId.append(self.url_list[i]["id"])
 
-		#print "spaceId: "+str(spaceId)
-
 		spaceIdStr = "EQ("+str(spaceId[0])+"),"
 		'''
 		3º for
@@ -168,12 +148,7 @@ class findUrl(object):
 		for i in range (1, len(spaceId)):	
 			spaceIdStr = spaceIdStr+"EQ("+str(spaceId[i])+"),"
 
-		#print "IdSTr: "+str(spaceIdStr)
-		
-
 		spaceIdStr = spaceIdStr[:-1]
-		
-		#print "IdSTr2: "+str(spaceIdStr)
 		
 		now = datetime.now()
 		dateNow = str(now.year)+"-"+str(now.month)+"-"+str(now.day)
@@ -212,8 +187,6 @@ class findUrl(object):
 		6º for
 		'''
 		for i in range (0, len(self.eventJson)):
-			#value="nome"
-			#self.text+= "\n"+str(value)+":"
 			self.text+= "\n"+unicode(self.eventJson[i]["name"])
 			self.text+=  "\n-----------------------------------------"
 		return self.text

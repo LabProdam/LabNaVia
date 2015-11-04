@@ -41,34 +41,10 @@ def rotateCenter(image, angle):
     return rot_image
 
 
-'''
-def blitAlpha(display, img, pos, opacity):
-    x = pos[0]
-    y = pos[1]
-    temp = pygame.Surface((img.get_width(), img.get_height())).convert()
-    temp.blit(display, (-x, -y))
-    temp.blit(img, (0, 0))
-    temp.set_alpha(opacity)        
-    display.blit(temp, pos)
-'''
-'''
-def roundedRect(color,size):
-	surface=pygame.Surface(size)
-	rect=surface.get_rect()
-	color_key=(255-color[0],255-color[1],255-color[2])
-	surface.fill(color_key)
-	surface.set_colorkey(color_key)
-	pygame.draw.ellipse(surface,color,rect)
-'''
 def screenLoop(main_screen):
 	main_screen.startMusic()
 	while main_screen.running:
 		debugLog('\tcomeco tela')
-		'''
-		debugLog('\t'+str(len(main_screen.previous_screen_list))+' telas anteriores')
-		for i,p in enumerate(main_screen.previous_screen_list):
-			debugLog('\t\t'+str(i)+' : '+str(p.title) )
-		'''
 		main_screen.run()
 		if main_screen.stored_screen:
 			debugLog('\t||comeco troca tela')
@@ -81,17 +57,8 @@ def screenLoop(main_screen):
 			next_screen.resize_scale=(main_screen.resize_scale[0],main_screen.resize_scale[1])
 			next_screen.final_display=main_screen.final_display
 			main_screen.stored_screen=None
-			
 			if not next_screen.previous_screen:
 				next_screen.previous_screen=main_screen
-			
-			'''
-			if main_screen.previous_screen==True:
-				next_screen.previous_screen_list=main_screen.previous_screen_list[:-1]
-				main_screen.previous_screen=False
-			else:
-				next_screen.previous_screen_list=main_screen.previous_screen_list+[main_screen]
-			'''
 			main_screen=next_screen
 			debugLog('\t||fim troca tela')
 		debugLog('\tfim tela')
@@ -203,10 +170,7 @@ class innerScreen(motherScreen):
 			except: pass
 			try: item.innerManipulation(self)
 			except: pass
-'''
-class rollingBar(object):
-	def __init__(self,surface,
-'''
+
 class movableScreen(innerScreen):
 	def __init__(self,vel,move,size,pos,color,*itens):
 		self.vel=vel
@@ -219,7 +183,6 @@ class movableScreen(innerScreen):
 			if event.key==self.move_key[0]:	self.pos[0]-=self.vel
 			if event.key==self.move_key[1]:	self.pos[0]+=self.vel
 	def eventControler(self,event,resize,move=(0,0)):
-		#move=(self.pos[0]+move[0],self.pos[1]+move[1])
 		innerScreen.eventControler(self,event,resize,move)#######################
 		self.keyInput(event)
 
@@ -272,23 +235,14 @@ class toggleScreen(innerScreen):
 					self.pos=[o_dest[0],o_dest[1]]
 					
 			self.moving=False
-			#self.turned_on=False
 	def blitOn(self,display):
 		if self.turned_on:
 			self.moveScreen(self.end_pos,1)
 		else:
 			self.moveScreen(self.init_pos,-1)
 		if self.actived():
-	
-			#self.display.fill((123,132,231))
-			#self.display.set_colorkey((123,132,231))
 			self.display=pygame.Surface(self.display.get_size(),pygame.SRCALPHA,32)
 			motherScreen.blitOn(self,self.display)
-	
-			#self.display.blit(display,(-self.pos[0],-self.pos[1]))
-			#self.display.blit(rotateCenter(temp,self.rotation),(0,0))
-	
-			#temp.blit(rotateCenter(self.display,self.rotation),(0,0) )
 			if self.rotation>0:
 				display.blit(rotateCenter(self.display,self.rotation),self.pos)
 			else:
@@ -315,11 +269,6 @@ class renderList(object):
 			for e in range(i+1,len(dlist)):
 				if dlist[i][2].bottom>dlist[e][2].bottom:
 					dlist[i],dlist[e]=dlist[e],dlist[i]
-		'''try:
-			sorted(self.display_list,key=lambda item: (item[2].y,item[2].x))
-			#sorted(self.display_list,key=lambda item: (item[2].y))
-		except Exception,e:print e
-		'''
 	def blitOn(self,display):
 		try:
 			for item in self.display_list:
@@ -336,20 +285,14 @@ class screenObject(motherScreen):
 		self.resize_scale=(1,1)
 		self.fps=fps
 		self.stored_screen=None
-		
 		self.previous_screen=None
-		
-		'''
-		self.previous_screen=False
-		self.previous_screen_list=[]
-		'''
 		self.running=True
 		self.full_screen=False
 		self.title=""
 		self.show_fps=False
 		self.final_display=None
 		self.stored_music=False
-		self.setMusic(None,None,None,False)
+		self.setMusic(None)
 		self.rotate=0
 		self.setEscFunction(self.closeGame)
 		self.play=False
@@ -368,8 +311,8 @@ class screenObject(motherScreen):
 		global mute_music
 		if self.music:
 			mixer.music.load(self.music)
-		if not mute_music: 
-			mixer.music.play(self.repeat,self.startpos)
+			if not mute_music: 
+				mixer.music.play(self.repeat,self.startpos)
 	def setFullscreen(self,fullscr_bool=True):
 		new_size=(int(self.size[0]*self.resize_scale[0]),int(self.size[1]*self.resize_scale[1]) )
 		self.full_screen=fullscr_bool
@@ -383,7 +326,6 @@ class screenObject(motherScreen):
 	def setNewSizeScale(self, new_size):
 		self.resize_scale=(float(new_size[0])/self.size[0],float(new_size[1])/self.size[1])
 		self.final_display=pygame.display.set_mode((int(new_size[0]),int(new_size[1])),RESIZABLE if not self.full_screen else FULLSCREEN)
-	# run da tela
 	def setEscFunction(self,function,*args):
 		self.function=function
 		self.args=list(args)
@@ -395,6 +337,8 @@ class screenObject(motherScreen):
 		if pygame.display.get_init():
 			self.final_display=pygame.display.get_surface()
 		elif not self.final_display: 
+			pygame.init()
+			pygame.display.init()
 			new_size=(int(self.size[0]*self.resize_scale[0]),int(self.size[1]*self.resize_scale[1]) )
 			self.final_display=pygame.display.set_mode(new_size,RESIZABLE if not self.full_screen else FULLSCREEN)
 			debugLog('\t>>pygame.display.set_mode()')
@@ -402,13 +346,6 @@ class screenObject(motherScreen):
 		fps_clock=pygame.time.Clock()
 		pygame.display.set_caption(self.title)
 		self.preEvents()
-		'''###
-		if android:
-			cgps_hardware = autoclass("com.lab.labnavia.Hardware")
-			gps_hardware = cgps_hardware()
-			locationManager = gps_hardware.startLocationManager()
-			gps_hardware.startLocationUpdater(locationManager,10000,1)
-		'''###
 		if self.play: self.startMusic()
 		while self.running and not self.stored_screen:
 			if android :
@@ -439,25 +376,9 @@ class screenObject(motherScreen):
 			self.stored_screen=self.screenCall()
 			
 			self.blitOn(pre_display)
-			'''
-			self.blitOn(self.render_list)
-			self.render_list.reorderList()
-			self.render_list.blitOn(pre_display)
-			'''
 			debugLogScreen(pre_display,str(int(fps_clock.get_fps()))+":"+str(self.fps),(0,0),(255,55,55))
-			'''
-			if android:
-				debugLogScreen(pre_display,str(gps_hardware.location.latitude),(0,50),(0,0,0))
-				debugLogScreen(pre_display,str(gps_hardware.location.longitude),(0,100),(0,0,0))
-				
-				#location=gps_hardware.getLocation(locationManager)
-				#debugLogScreen(pre_display,str(location.getLatitude()),(120,30),(0,0,255))
-				#debugLogScreen(pre_display,str(location.getLongitude()),(120,30),(0,0,255))
-			'''
 			pygame.transform.scale(pre_display if self.rotate==0 else pygame.transform.rotate(pre_display.convert(),self.rotate),(int(self.size[0]*self.resize_scale[0]),int(self.size[1]*self.resize_scale[1])),self.final_display)
 			self.screenManipulation(self)
-			'''self.render_list.setZero()'''
-
 			pygame.display.flip()
 			fps_clock.tick(self.fps)
 			debugLogSuper('\t\tFim passagem')
@@ -521,7 +442,6 @@ class movingImage(simpleImage):
 			self.pos[0]+=self.move[0]
 			self.pos[1]+=self.move[1]
 		else:
-			print 'fim'
 			self.stop=True
 			if self.auto_fit:
 				if self.pos[0]!=self.end_pos[0] or self.pos[0]!=self.end_pos[0]:
@@ -540,20 +460,11 @@ class loopImage(movingImage):
 		self.end_pos=[self.first_end_pos[n] for n in range(2)]
 	def repeatEngine(self):
 		if self.rewind:
-			print 'ok'
 			for n in range(2):
 				self.move[n]*=(-1)
 				self.diff[n]*=(-1)
 			self.init_pos,self.end_pos=[self.end_pos[0],self.end_pos[1]],[self.init_pos[0],self.init_pos[1]]
 			self.stop=False
-			
-			'''
-			new_init=[self.end_pos[0],self.end_pos[1]]
-			new_end=[self.init_pos[0],self.init_pos[1]]
-			self.end_pos=new_end
-			self.init_pos=new_init
-			'''
-			print 'ok2'
 		else:
 			movingImage.posEvents(self)
 	def blitOn(self,display):
@@ -590,8 +501,10 @@ class simpleButton(object):
 		self.selected_skin=selection
 	def addSkin(self,skin):
 		self.skin.append(skin)
-	def callActivation(self):
-		self.actived=True
+	def callActivation(self,activate=True):
+		self.actived=activate
+		self.pressed=False
+		self.pressed_out=False
 	def setImg(self,img):
 		self.img=img
 	def setText(self,text):
@@ -635,10 +548,17 @@ class simpleButton(object):
 				if len(self.img)>1:self.state=1
 				self.pressed=True
 		elif button_up or self.state==2:
-			if button_up: self.pressed_out=True
+			if button_up: 
+				self.pressed_out=True
+				#self.pressed=False#solução para movimento do ciclista quando segurava o clique e soltava fora do botão
 			self.state=0
 	def eventControler(self,event,resize,move):
+		if type(self.img[self.state])!=pygame.Surface:
+			self.img[self.state].eventControler(event,resize,move)
 		if not self.lock: self.runEventControler(event,resize,move)
+	def preEvents(self):
+		if type(self.img[self.state])!=pygame.Surface:
+			self.img[self.state].preEvents()
 	def blitButton(self,display):
 		image = self.img[self.state] if type(self.img[self.state])==pygame.Surface else self.img[self.state].blitOn(None)
 		display.blit(image,self.pos)
@@ -709,8 +629,6 @@ class geniusButton(object):
 	def blitOn(self,display):
 		try:display.blit(self.img[self.state],self.pos)
 		except Exception,e:print e
-		#pygame.draw.circle(display,(0 if self.state==0 else 255,0,0),self.centro,self.raio_maior)
-		#pygame.draw.circle(display,(255,255,255),self.centro,self.raio_menor)
 	def screenCall(self):
 		retorno=None
 		if self.active!=0:
@@ -725,53 +643,6 @@ class geniusButton(object):
 			self.state=0
 		return retorno
 			
-'''
-#incompleto
-class polygonButton(simpleButton):
-	def __init__(self,pos,point_list):
-		simpleButton.__init__(self,[pygame.Surface((0,0))for n in range(3)],pos,None)
-		self.polygon=pylygon.Polygon(point_list)
-		self.polygon.move_ip(pos[0],pos[1])
-		self.rect=pylygon.Polygon(point_list)
-		self.rect.move_ip(pos[0],pos[1])
-		self.state=0
-	def relocateButton(self,move):
-		if self.pos[0]+move[0]!=self.rect.get_rect().x or self.pos[1]+move[1]!=self.rect.get_rect().y:
-			try:self.rect=self.polygon.move(move[0],move[1])
-			except Exception,e:print e
-	###
-	def eventControler(self,event,resize,move):
-		self.relocateButton(move)
-		mouse_pos=(event.pos[0]/resize[0],event.pos[1]/resize[1])
-		if self.rect.collidepoint(mouse_pos):
-			if self.sound[1] and self.state!=2: 
-				self.sound[1][0].play()
-				pygame.time.wait(self.sound[1][1])
-			if len(self.img)>2:self.state=2
-			if event.type==MOUSEBUTTONUP and event.button==1:
-				if self.vibrate[0]>0 and android:android.vibrate(self.vibrate[0])
-				if self.sound[0]: 
-					self.sound[0][0].play()
-					pygame.time.wait(self.sound[0][1])
-				self.actived=True
-				self.pressed=False
-				if len(self.img)>3 and self.state!=3:
-					self.state=3
-				else:self.state=0
-			if event.type==MOUSEBUTTONDOWN and event.button==1:
-				if self.vibrate[1]>0 and android:android.vibrate(self.vibrate[1])
-				if self.sound[2]: 
-					self.sound[2][0].play()
-					pygame.time.wait(self.sound[2][1])
-				if len(self.img)>1:self.state=1
-				self.pressed=True
-		elif button_up or self.state==2:
-			if button_up: self.pressed_out=True
-			self.state=0
-	###
-	def blitOn(self,display):
-		pygame.draw.polygon(display, (0,0,0) if self.state==0 else (255,255,255), self.polygon)
-'''
 class textButton(simpleButton):
 	def __init__(self,img,pos,text_pos,text_font,text='',antialias=True,color=(0,0,0),limit=-1):
 		simpleButton.__init__(self,img,pos,[pygame.Surface((0,0)),text_pos])
@@ -788,26 +659,20 @@ class textButton(simpleButton):
 		self.pointer_color=color
 	def eventControler(self,event,resize,move):
 		if event.type==KEYDOWN and self.edit_actived:
-			print 'teclado'
 			if event.key==K_RIGHT:
 				if self.edit_pos<len(self.edit_text):
 					self.edit_pos+=1
-					print 'direita'
 			elif event.key==K_LEFT:
 				if self.edit_pos>0:
 					self.edit_pos-=1
-					print 'esquerda'
 			elif len(self.edit_text)<self.edit_limit or self.edit_limit==-1:
-				print 'vai digitar'
 				char=chr(event.key)
 				if KMOD_LSHIFT or KMOD_RSHIFT or KMOD_SHIFT or KMOD_CAPS:
 					char.upper()
 				self.edit_text=self.edit_text[:self.edit_pos]+char+self.edit_text[self.edit_pos:]
 				self.edit_pos+=1
-				print 'digitou'
 		simpleButton.eventControler(self,event,resize,move)
 		if self.actived:
-			print 'ok'
 			self.edit_actived=True
 			self.actived=False
 	def blitText(self,display):
@@ -938,6 +803,8 @@ class buttonList(object):
 		self.buttons[self.state].blitOn(display)
 	def screenManipulation(self):
 		self.buttons[self.state].screenManipulation()
+	def callActivation(self):
+		self.buttons[self.state].callActivation()
 	def posEvents(self):
 		self.buttons[self.state].posEvents()
 	def screenCall(self):
@@ -976,18 +843,6 @@ class backButton(functionButton):
 			self.link=screen.previous_screen
 			if self.clear: self.function = lambda : self.clearPrevious(screen)
 
-'''
-class backButton(functionButton):
-	def __init__(self,link,img,pos,text_and_pos=None):
-		functionButton.__init__(self,None,link,img,pos,text_and_pos)
-	def turnOn(self,screen):
-		screen.previous_screen=True
-	def screenManipulation(self,screen):
-		if self.link!=screen.previous_screen_list[-1]:
-			self.link=screen.previous_screen_list[-1]
-			self.function = lambda : self.turnOn(screen)
-'''
-
 class toggleFunctionButton(functionButton):
 	turned_on=True
 	def turnOn(self,boolean=True): self.turned_on=boolean
@@ -995,10 +850,6 @@ class toggleFunctionButton(functionButton):
 		if self.turned_on: functionButton.blitOn(self,display)
 	def eventControler(self,ev,rs,mv):
 		if self.turned_on: functionButton.eventControler(self,ev,rs,mv)
-
-#class functionBackButton(functionButton,backButton):pass
-#	def __init__(self,function,link,img,pos,text_and_pos=None):
-#		super(self, functionBackButton).__init__()
 
 class abstractSelection(object):
 	def __init__(self,surface,movable,actived,K_keys=((K_LEFT,K_RIGHT),(K_UP,K_DOWN)) ):
@@ -1008,8 +859,6 @@ class abstractSelection(object):
 		self.K_keys=K_keys
 	def preEvents(self):
 		self.called=False
-		#self.grade_pos=[self.init_pos[x] for x in range(2)]
-		#self.selected=0
 	def selectionMove(self,i,e):pass
 	def eventControler(self,event,resize,move):
 		if event.type==KEYUP:
@@ -1080,13 +929,8 @@ class freeSelection(abstractSelection):
 		select=self.selected
 		for i in range(len(self.options)): # para cada botao na lista
 			if self.options[i].pos[xy]*direction>self.options[self.selected].pos[xy]*direction: #se o botao estiver no sentido da tecla apertada
-				#new_dxy = abs(self.options[i].pos[xy]-self.options[self.selected].pos[xy]) # a distancia no sentido da tecla apertada
-				#new_dnotxy = abs(self.options[i].pos[abs(xy-1)]-self.options[self.selected].pos[abs(xy-1)]) # a distancia no outro sentido
-				#new_distancia=pow(pow(new_dxy,2)+pow(new_dnotxy,2),0.5)
 				rect_1=self.options[i].img[0].get_rect(x=self.options[i].pos[0],y=self.options[i].pos[1])
 				rect_2=self.options[self.selected].img[0].get_rect(x=self.options[self.selected].pos[0],y=self.options[self.selected].pos[1])
-				#try:print str(new_distancia)+' : '+str(rectsDistance(rect_1,rect_2))
-				#except Exception,e: print e
 				new_distancia=rectsDistance(rect_1,rect_2)
 				if new_distancia<distancia or distancia<0:
 					distancia=new_distancia
@@ -1160,7 +1004,7 @@ def textBox(text_string,font,width,text_color=(0,0,0),limit=None,anti_alias=True
 	if line_width>width: line_width=width
 	for text in splited_text:
 		splited_and_wraped_text+=wrap_multi_line(text,font,width)
-	lines=len(splited_and_wraped_text) if not limit else limit
+	lines=len(splited_and_wraped_text) if not limit  or limit>len(splited_and_wraped_text) else limit
 	if limit!=None and limit<len(splited_and_wraped_text): 
 		splited_and_wraped_text[limit-1]=splited_and_wraped_text[limit-1][:-3]+'...'
 	surface=pygame.Surface((line_width,lines*(height+1)), pygame.SRCALPHA, 32)
@@ -1217,8 +1061,24 @@ class innerScroller(object):
 
 class renderText(object):
 	def __init__(self,font,text,color,pos,surface_width=None):
-		self.render=font.render(text,True,color)
+		self.setNewRender(font,text,color)
 		self.pos=(pos[0]+(surface_width//2)-(font.size(text)[0]//2),pos[1]) if surface_width else pos
+	def setNewText(self,text):
+		self.text=text
+		self.renderText()
+	def setNewColor(self,color):
+		self.color=color
+		self.renderText()
+	def setNewFont(self,font):
+		self.font=font
+		self.renderText()
+	def setNewRender(self,font,text,color):
+		self.text=text
+		self.color=color
+		self.font=font
+		self.renderText()
+	def renderText(self):
+		self.render=self.font.render(self.text,True,self.color)
 	def blitOn(self,display):
 		display.blit(self.render,self.pos)
 
@@ -1264,7 +1124,6 @@ def rgb2hls(r,g,b):
 
 class colorPickerHLS(object):
 	def __init__(self,pos,button_size,bar_pos,bar_size,sample_pos,sample_size,first_color,function=None):
-		#first_color=[0,50,0]
 		self.function=function
 		self.first_hls=[color for color in first_color]
 		self.resetColor()
@@ -1307,13 +1166,6 @@ class colorPickerHLS(object):
 		pointer_rect=self.pointer[0].get_rect()
 		pointer_rect.center=((self.hls[0]*self.size[0][0])+self.pos[0][0],(self.hls[2]*self.size[0][1])+self.pos[0][1])
 		display.blit(self.pointer[0],pointer_rect.topleft)
-		#display.fill((255,255,255),pygame.Rect( (self.hls[0]*self.size[0][0])+self.pos[0][0],(self.hls[2]*self.size[0][1])+self.pos[0][1],self.size[0][0] if self.size[0][0]>=1 else 1 ,self.size[0][1] if self.size[0][1]>=1 else 1 ))
-		
-		'''
-		for h in range(361):
-			for s in range(101):
-				display.fill(hls2rgb(h,50,s),pygame.Rect((h*size1[0])+pos1[0],(s*size1[1])+pos1[1],size1[0],size1[1]))
-		'''
 		size2=self.size[1]
 		pos2=self.pos[1]
 		line_rect=pygame.Rect((0,0),size2)
@@ -1322,16 +1174,7 @@ class colorPickerHLS(object):
 			display.fill(hls2rgb(self.hls[0],l,self.hls[2]),line_rect)
 		if self.pos[2]!=None and self.size[2]!=None: display.fill(self.rgb,pygame.Rect(self.pos[2],self.size[2]))
 		line_rect.topleft=((self.hls[1]*self.size[1][0])+self.pos[1][0],self.pos[1][1])
-		#display.fill((0,0,0),line_rect)
-		color=tuple(255-self.rgb[x] for x in range(3))#tuple(255-(255*self.hls[1]/100) for x in range(3))
+		color=tuple(255-self.rgb[x] for x in range(3))
 		pygame.draw.polygon(self.pointer[1],color,[[self.size[1][0]*3,0],[0,self.size[1][0]*6],[self.size[1][0]*6,self.size[1][0]*6] ])
 		display.blit(self.pointer[1],line_rect.move(-size2[0]*3,size2[1]-self.pointer[1].get_height() ).topleft)
 		display.blit(pygame.transform.flip(self.pointer[1],False,True),line_rect.move(-size2[0]*3,0).topleft)
-
-class simpleWhiteText(object):
-	def __init__(self,text,pos,font):
-		self.text=text
-		self.pos=pos
-		self.font=font
-	def blitOn(self,display):
-		display.blit(self.font.render(self.text, True, (255,255,255)),self.pos)

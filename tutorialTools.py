@@ -69,21 +69,7 @@ class tutorialObject(object):
 	def blitOn(self, display):
 		#imagem screenshot
 		display.blit(self.passos_lista[self.apontador].getImage(),(0,0))
-		#template
-		#display.blit(self.temp_img,(0,0))
-		#texto centralizado
-
-		#text=self.passos_lista[self.apontador].getText()
-		
-		#text_size=chic_16.size(text)
-		#render=textBox(text,chic_16,640,(155,155,155),None,True,(222,222,222))#chic_16.render(text,True,(33,33,33))
-		#display.blit(render,( (display.get_width()/2)-(render.get_width()/2)+1 ,120+1))
-		
-		#render=textBox(text,chic_16,640,(33,33,33),None,True,(222,222,222))
-		#display.blit(render,( (display.get_width()/2)-(render.get_width()/2) ,120))
-		
 		#mao animada
 		pos=list(self.passos_lista[self.apontador].icone_pos)
 		pos[1]+=self.y
-		#display.fill((0,0,0),self.passos_lista[self.apontador].rect)
 		display.blit(self.passos_lista[self.apontador].getIcone(),pos)

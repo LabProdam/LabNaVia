@@ -1,10 +1,10 @@
 ##O que é o LabNaVia?  
 
-O jogo "LabNaVia" é uma inciativa do LabProdam em conjunto com a Prefeitura de São Paulo que tem por objetivo consolidar a cultura do ciclismo na vida do cidadão. Alinhado com o ideário do São Paulo Aberta (saopauloaberta.prefeitura.sp.gov.br), o jogo enquadra-se na agenda de Governo Aberto, que tem como objetivo articular ações de transparência, integridade, participação popular e inovação tecnológica em todo ciclo de políticas públicas.
+	O jogo "LabNaVia" é uma inciativa do LabProdam em conjunto com a Prefeitura de São Paulo que tem por objetivo consolidar a cultura do ciclismo na vida do cidadão. Alinhado com o ideário do São Paulo Aberta (saopauloaberta.prefeitura.sp.gov.br), o jogo enquadra-se na agenda de Governo Aberto, que tem como objetivo articular ações de transparência, integridade, participação popular e inovação tecnológica em todo ciclo de políticas públicas.
 
-Utilizando os desafios encontrados nas vias públicas, o "LabNaVia" não só educa o jogador, incentivando-o à pratica esportiva e a conduta adequada às ciclovias, como também o convida a explorar os equipamentos culturais de seu município: através da geolocalização em conjunto com os mapas culturais - iniciativa do SP Cultura - o jogo é capaz de exibir de maneira interativa informações de eventos, espaços e agentes de cultura próximos de sua posição.
+	Utilizando os desafios encontrados nas vias públicas, o "LabNaVia" não só educa o jogador, incentivando-o à pratica esportiva e a conduta adequada às ciclovias, como também o convida a explorar os equipamentos culturais de seu município: através da geolocalização em conjunto com os mapas culturais - iniciativa do SP Cultura - o jogo é capaz de exibir de maneira interativa informações de eventos, espaços e agentes de cultura próximos de sua posição.
 
-A idéia deste projeto foi divertir, incentivar e informar com um produto do governo. 
+	A idéia deste projeto foi divertir, incentivar e informar com um produto do governo. 
 
 ##Ferramentas Utilizadas
 
