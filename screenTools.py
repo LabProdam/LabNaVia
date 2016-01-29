@@ -29,8 +29,8 @@ mute_music=False
 def setMuteMusic(mute=True):
 	global mute_music
 	mute_music=mute
-''' !!!!!! As seguintes funções estão deixando o jogo lento !!!!!! '''
 
+#essa classe está dando erro para alguns ângulos, fazendo o pause piscar enquanto gira, provavelmente o erro está no recorte da imagem fora da área
 def rotateCenter(image, angle):
     """rotate an image while keeping its center and size"""
     orig_rect = image.get_rect()#pega retangulo da imagem
@@ -40,29 +40,32 @@ def rotateCenter(image, angle):
     rot_image = rot_image.subsurface(rot_rect).copy()#recorta dentro do novo retangulo
     return rot_image
 
-
+#cuida do fluxo de telas
 def screenLoop(main_screen):
 	main_screen.startMusic()
 	while main_screen.running:
 		debugLog('\tcomeco tela')
-		main_screen.run()
+		main_screen.run()#ciclo da tela atual
 		if main_screen.stored_screen:
 			debugLog('\t||comeco troca tela')
-			next_screen=main_screen.stored_screen
-			next_screen.full_screen=main_screen.full_screen
-			if next_screen.stopmusic:mixer.music.stop()
+			next_screen=main_screen.stored_screen#pega a tela armazenada
+			next_screen.full_screen=main_screen.full_screen#a tela armazenada pega a informação de tela cheia da tela anterior
+			if next_screen.stopmusic:mixer.music.stop()#se a tela armazenada tiver a instrução para parar a música ela pára aqui.
+			#condições de continuidade de música#
 			main_screen.play=False
 			if main_screen.music!=None or next_screen.stopmusic:
 				if next_screen.music and main_screen.music!=next_screen.music: next_screen.play=True
-			next_screen.resize_scale=(main_screen.resize_scale[0],main_screen.resize_scale[1])
-			next_screen.final_display=main_screen.final_display
-			main_screen.stored_screen=None
+			##
+			next_screen.resize_scale=(main_screen.resize_scale[0],main_screen.resize_scale[1])#a tela armazenada pega a informação de tamanho atual da tela anterior
+			next_screen.final_display=main_screen.final_display#pega a janela da tela anterior
+			main_screen.stored_screen=None#limpa a tela armazenada da tela anterior
 			if not next_screen.previous_screen:
-				next_screen.previous_screen=main_screen
-			main_screen=next_screen
+				next_screen.previous_screen=main_screen#armazena a tela anterior como tela anterior da nova tela se ela não tiver uma tela anterior
+			main_screen=next_screen#a tela anterior é substituida pela nova
 			debugLog('\t||fim troca tela')
 		debugLog('\tfim tela')
 
+#classe mãe das possíveis telas, cuida do sistema de itens de tela
 class motherScreen(object):
 	def __init__(self,size,color,*itens):
 		self.size=size
@@ -140,7 +143,7 @@ class motherScreen(object):
 				qnt+=1
 		return qnt
 		
-
+#uma tela interna simples
 class innerScreen(motherScreen):
 	def __init__(self,size,pos,color,*itens):
 		motherScreen.__init__(self,size,color,*itens)
@@ -171,6 +174,7 @@ class innerScreen(motherScreen):
 			try: item.innerManipulation(self)
 			except: pass
 
+#uma tela interna que manipula a própria posição de acordo com teclas fornecidas
 class movableScreen(innerScreen):
 	def __init__(self,vel,move,size,pos,color,*itens):
 		self.vel=vel
@@ -186,6 +190,7 @@ class movableScreen(innerScreen):
 		innerScreen.eventControler(self,event,resize,move)#######################
 		self.keyInput(event)
 
+#uma tela interna que ativa/desativa, mudando sua posição e rotacionando 
 class toggleScreen(innerScreen):
 	def __init__(self,size,color,pos,end,move,rotate=0,auto_fit=True,*itens):
 		innerScreen.__init__(self,size,pos,color,*itens)
@@ -254,6 +259,7 @@ class toggleScreen(innerScreen):
 	def screenCall(self):
 		if self.actived(): return motherScreen.screenCall(self)
 
+#sistema de renderização de acordo com o x e y, independente de qual seja a ordem, ele rearranjará colocando as coisas mais a direita e ao topo para trás, dando impressão de profundidade
 class renderList(object):
 	display_list=[]
 	empty_rect=pygame.Rect(-1,-1,-1,-1)
@@ -276,9 +282,9 @@ class renderList(object):
 					display.fill(item[1],None if item[2]==self.empty_rect else item[2],item[3])
 				else:
 					display.blit(item[1],(item[2].x,item[2].y),item[3],item[4])
-		except Exception,e:print e
+		except Exception,e:debugLog(e)
 		
-
+#o principal sistema de tela, tem loop próprio, os outros tipos de telas são itens desse.
 class screenObject(motherScreen):
 	def __init__(self, size, fps, color, *itens):
 		motherScreen.__init__(self,size,color,*itens)
@@ -297,8 +303,10 @@ class screenObject(motherScreen):
 		self.setEscFunction(self.closeGame)
 		self.play=False
 		self.loading_image=None
-	def setLoading(self,image):
+		self.loading_pos=(0,0)
+	def setLoading(self,image,pos):
 		self.loading_image=image
+		self.loading_pos=pos
 	def setMusic(self, music, stop=False,repeat=-1,startpos=0.0):
 		if music==-1:
 			self.stopmusic=True
@@ -342,7 +350,7 @@ class screenObject(motherScreen):
 			new_size=(int(self.size[0]*self.resize_scale[0]),int(self.size[1]*self.resize_scale[1]) )
 			self.final_display=pygame.display.set_mode(new_size,RESIZABLE if not self.full_screen else FULLSCREEN)
 			debugLog('\t>>pygame.display.set_mode()')
-		pre_display=pygame.Surface(self.size)
+		self.pre_display=pygame.Surface(self.size)
 		fps_clock=pygame.time.Clock()
 		pygame.display.set_caption(self.title)
 		self.preEvents()
@@ -375,21 +383,25 @@ class screenObject(motherScreen):
 
 			self.stored_screen=self.screenCall()
 			
-			self.blitOn(pre_display)
-			debugLogScreen(pre_display,str(int(fps_clock.get_fps()))+":"+str(self.fps),(0,0),(255,55,55))
-			pygame.transform.scale(pre_display if self.rotate==0 else pygame.transform.rotate(pre_display.convert(),self.rotate),(int(self.size[0]*self.resize_scale[0]),int(self.size[1]*self.resize_scale[1])),self.final_display)
+			self.makeBlitOn(fps_clock)
 			self.screenManipulation(self)
 			pygame.display.flip()
 			fps_clock.tick(self.fps)
 			debugLogSuper('\t\tFim passagem')
 		self.posEvents()
 		if self.loading_image:
-			self.blitBg(pre_display)
-			try:pre_display.blit(self.loading_image,self.loading_image.get_rect(center=(self.size[0]//2,self.size[1]//2)).topleft)
-			except Exception,e:print e
-			pygame.transform.scale(pre_display if self.rotate==0 else pygame.transform.rotate(pre_display.convert(),self.rotate),(int(self.size[0]*self.resize_scale[0]),int(self.size[1]*self.resize_scale[1])),self.final_display)
+			self.blitBg(self.pre_display)
+			try:self.pre_display.blit(self.loading_image,self.loading_pos)
+			except Exception,e:debugLog(e)
+			pygame.transform.scale(self.pre_display if self.rotate==0 else pygame.transform.rotate(self.pre_display.convert(),self.rotate),(int(self.size[0]*self.resize_scale[0]),int(self.size[1]*self.resize_scale[1])),self.final_display)
 			pygame.display.flip()
-			
+	def makeBlitOn(self,fps_clock=None):
+		self.blitOn(self.pre_display)
+		if fps_clock: debugLogScreen(self.pre_display,str(int(fps_clock.get_fps()))+":"+str(self.fps),(0,0),(255,55,55))
+		pygame.transform.scale(self.pre_display if self.rotate==0 else pygame.transform.rotate(self.pre_display.convert(),self.rotate),(int(self.size[0]*self.resize_scale[0]),int(self.size[1]*self.resize_scale[1])),self.final_display)
+		
+
+#um simples retangulo em forma de item da screenObject
 class simpleRect(object):
 	def __init__(self,color=None,rect=None):
 		self.rect=rect
@@ -400,6 +412,7 @@ class simpleRect(object):
 		if self.color!=None:
 			display.fill(self.color,self.rect)
 
+#desenha a imagem fornecida na posição fornecida, a posição dada pode ser orientada pelo centro da imagem também
 class simpleImage(object):
 	def __init__(self,img,pos,center=False):
 		self.img=img
@@ -416,6 +429,7 @@ class simpleImage(object):
 	def showImage(self):
 		self.show=True
 
+#pega uma imagem retornada por um método e a desenha na tela
 class functionImage(simpleImage):
 	def __init__(self,img,pos,*args):
 		self.args=list(*args)
@@ -423,6 +437,8 @@ class functionImage(simpleImage):
 	def blitOn(self,display):
 		if self.show: display.blit(self.img(*self.args),self.pos)
 
+#Uma imagem que se move de uma posição a outra
+#funcionando, mas não é utilizado no LabNaVia
 class movingImage(simpleImage):
 	def __init__(self,img,pos,end,mov,auto_fit=True):
 		pos=[pos[0],pos[1]]
@@ -448,6 +464,7 @@ class movingImage(simpleImage):
 					self.pos=[self.end_pos[0],self.end_pos[1]]
 		display.blit(self.img,self.pos)
 
+#Uma imagem que se move de uma posição a outra e invertendo o movimento toda vez que chega a uma das posições
 class loopImage(movingImage):
 	def __init__(self,img,pos,end,mov,rewind=False):
 		mov=[mov[0],mov[1]]
@@ -472,6 +489,7 @@ class loopImage(movingImage):
 		if self.stop:
 			self.repeatEngine()
 
+#classe mãe para todos os outros botões
 class simpleButton(object):
 	def __init__(self,img,pos,text_and_pos=None):
 		self.img=img
@@ -492,6 +510,7 @@ class simpleButton(object):
 		self.setVibrate()
 		self.hide=False
 		self.lock=False
+		self.auto_skin=False
 	def setLock(self,lock=True):
 		self.lock=lock
 	def setHide(self,hide=True):
@@ -501,6 +520,8 @@ class simpleButton(object):
 		self.selected_skin=selection
 	def addSkin(self,skin):
 		self.skin.append(skin)
+	def setAutoSkin(self,boolean=True):
+		self.auto_skin=boolean
 	def callActivation(self,activate=True):
 		self.actived=activate
 		self.pressed=False
@@ -516,7 +537,7 @@ class simpleButton(object):
 	def inflateButton(self,x,y):
 		self.inflate=(x,y)
 		try:self.rect.inflate_ip(x,y)
-		except Exception,e:print e
+		except Exception,e:debugLog(e)
 	def relocateButton(self,move):
 		if self.pos[0]+move[0]!=self.rect.x or self.pos[1]+move[1]!=self.rect.y:
 			self.rect=pygame.Rect(self.pos[0]+move[0],self.pos[1]+move[1],self.size[0],self.size[1] )
@@ -537,6 +558,11 @@ class simpleButton(object):
 					pygame.time.wait(self.sound[0][1])
 				self.actived=True
 				self.pressed=False
+				if self.auto_skin:
+					self.selected_skin+=1
+					if self.selected_skin>=len(self.skin):
+						self.selected_skin=0
+					self.setSkin(self.selected_skin)
 				if len(self.img)>3 and self.state!=3:
 					self.state=3
 				else:self.state=0
@@ -569,6 +595,7 @@ class simpleButton(object):
 			self.blitButton(display)
 			self.blitText(display)
 
+#classe que administra botões do menu pause
 class pauseButtons(object):
 	def __init__(self,pos,buttons,images):
 		self.imgs=images
@@ -583,17 +610,19 @@ class pauseButtons(object):
 					state=b
 					break
 			display.blit(self.imgs[state],self.pos)
-		except Exception,e:print e
+		except Exception,e:debugLog(e)
 
+#toca música se a variável global de mute for false
 def playSound(sound,time=0):
 	global mute_music
 	if not mute_music:
 		sound.play()
 		pygame.time.wait(time)
 
+#classe do painel de botões do menu principal
 class geniusButton(object):
 	def __init__(self,centro,raio_menor,raio_maior,image,pos,screens,sound=None):
-		print image[0].get_rect().center
+		debugLog(image[0].get_rect().center)
 		self.centro=[centro[i]+pos[i] for i in xrange(2)]
 		self.raio_menor=raio_menor
 		self.raio_maior=raio_maior
@@ -628,13 +657,13 @@ class geniusButton(object):
 			self.state=0
 	def blitOn(self,display):
 		try:display.blit(self.img[self.state],self.pos)
-		except Exception,e:print e
+		except Exception,e:debugLog(e)
 	def screenCall(self):
 		retorno=None
 		if self.active!=0:
 			if self.sound:
 				try:playSound(self.sound[0],self.sound[1])
-				except Exception,e:print e
+				except Exception,e:debugLog(e)
 			retorno=self.scr[self.active-1]
 			if type(retorno)==str:
 				webbrowser.open(retorno)
@@ -642,7 +671,9 @@ class geniusButton(object):
 			self.active=0
 			self.state=0
 		return retorno
-			
+
+'''Em desenvolvimento'''
+#uma caixa de texto: um botão que quando ativado pode receber texto do teclado
 class textButton(simpleButton):
 	def __init__(self,img,pos,text_pos,text_font,text='',antialias=True,color=(0,0,0),limit=-1):
 		simpleButton.__init__(self,img,pos,[pygame.Surface((0,0)),text_pos])
@@ -683,9 +714,9 @@ class textButton(simpleButton):
 				size=self.edit_font.size(self.edit_text[:self.edit_pos])
 				rect=pygame.Rect(size[0]+self.text[1][0],self.text[1][1]-1,1,size[1]+2)
 				display.fill(self.pointer_color,rect)
-			except Exception,e:print e
+			except Exception,e:debugLog(e)
 			
-			
+#um botão com um conjunto de imagens que muda quando é clicado
 class slideButton(simpleButton):
 	def __init__(self,img_list,pos,text_and_pos=None):
 		simpleButton.__init__(self,img_list[0],pos,text_and_pos)
@@ -699,6 +730,7 @@ class slideButton(simpleButton):
 			self.actived=False
 		return None
 
+#um botão que acessa uma url quando ativado, tanto no pc quanto no android
 class urlButton(simpleButton):
 	def __init__(self,url,img,pos,text_and_pos=None):
 		self.url=url
@@ -711,6 +743,7 @@ class urlButton(simpleButton):
 			self.actived=False
 		return None
 
+#um botão que chama uma tela quando ativado, principal responsável pelo fluxo de telas
 class linkButton(simpleButton):
 	def __init__(self,link,img,pos,text_and_pos=None):
 		self.link=link
@@ -724,6 +757,7 @@ class linkButton(simpleButton):
 			self.actived=False
 		return the_return if not self.lock else None
 
+#um linkButton que se move de uma posição inicial a uma final, quando a tela termina ele volta para a posição inicial instantaneamente
 class movingButton(linkButton):
 	def __init__(self,link,img,pos,end,mov,rotate,auto_fit=True,text_and_pos=None):
 		pos=[pos[0],pos[1]]
@@ -754,7 +788,7 @@ class movingButton(linkButton):
 			display.blit(self.img[self.state],self.pos)
 		self.blitText(display)
 
-
+#um linkButton que roda uma função quando ativado, também pode rodar uma outra função enquanto pressionado
 class functionButton(linkButton):
 	def __init__(self,click_function,link,img,pos,text_and_pos=None,press_function=None,*args):
 		linkButton.__init__(self,link,img,pos,text_and_pos)
@@ -777,15 +811,16 @@ class functionButton(linkButton):
 		the_return=None
 		if self.press_function!=None and self.pressed:
 			try:self.press_function(*self.args_2)
-			except Exception, e: print e
+			except Exception, e: debugLog(e)
 		if self.actived:
 			if self.function!=None:
 				try:self.function(*self.args_1)
-				except Exception, e: print e
+				except Exception, e: debugLog(e)
 			the_return=self.link
 			self.actived=False
 		return the_return if not self.lock else None
 
+#um botão que carrega consigo uma lista de botões e fica alternando entre eles toda vez que ativado
 class buttonList(object):
 	def __init__(self,*buttons):
 		self.buttons=list(buttons)
@@ -816,6 +851,7 @@ class buttonList(object):
 			self.state=0
 		return to_return
 
+#Não é utilizado e não funciona, o buttonList serve como um bom substituto que funciona
 class checkButton(functionButton):
 	def __init__(self,click_function,link,img,pos,text_and_pos=[None],press_function=None):
 		functionButton.__init__(self,click_function,link,img[0],pos,text_and_pos[0],press_function)
@@ -832,6 +868,7 @@ class checkButton(functionButton):
 			except:pass
 		return functionButton.screenCall(self)
 
+#pega a tela anterior armazenada na tela atual e guarda como o próprio link
 class backButton(functionButton):
 	def __init__(self,img,pos,text_and_pos=None,clear=False):
 		functionButton.__init__(self,None,None,img,pos,text_and_pos)
@@ -843,6 +880,7 @@ class backButton(functionButton):
 			self.link=screen.previous_screen
 			if self.clear: self.function = lambda : self.clearPrevious(screen)
 
+#um functionButton que pode ser ocultado sem ser removido
 class toggleFunctionButton(functionButton):
 	turned_on=True
 	def turnOn(self,boolean=True): self.turned_on=boolean
@@ -851,6 +889,7 @@ class toggleFunctionButton(functionButton):
 	def eventControler(self,ev,rs,mv):
 		if self.turned_on: functionButton.eventControler(self,ev,rs,mv)
 
+#classe mãe para as classes de seleção de botão, apertando as teclas é possível navegar entre os botões que só funcionam por mouse
 class abstractSelection(object):
 	def __init__(self,surface,movable,actived,K_keys=((K_LEFT,K_RIGHT),(K_UP,K_DOWN)) ):
 		self.img=surface
@@ -876,6 +915,7 @@ class abstractSelection(object):
 			if event.key==K_SPACE:
 				self.called=True
 
+#para seleções em grade
 class gradeSelection(abstractSelection):
 	def __init__(self,options_matrix,surface,pos,movment=(10,10),end_pos=(1,1),init_pos=(0,0),movable=(True,True),actived=False):
 		abstractSelection.__init__(self,surface,movable,actived)
@@ -890,10 +930,11 @@ class gradeSelection(abstractSelection):
 		if self.actived: display.blit(self.img,[self.pos[x]+self.grade_pos[x]*self.move[x] for x in range(2)] )
 	def screenCall(self): return self.options[self.grade_pos[1]][self.grade_pos[0]] if self.called else None#retorno
 
+#funcões para cálculo de distancia entre os botões
 def pointsDistance(a,b):		
 	return pow(pow(a[0]-b[0],2)+pow(a[1]-b[1],2),0.5)
 def rectsDistance(rect_1,rect_2):
-	print (rect_1.x,rect_1.y)
+	debugLog((rect_1.x,rect_1.y))
 	#listas de posições possíveis dos limites dos retangulos
 	positions_1 = [(rect_1.x,rect_1.y),rect_1.topleft,rect_1.topright,rect_1.bottomleft,rect_1.bottomright,rect_1.midleft,rect_1.midright,rect_1.center]
 	positions_2 = [(rect_2.x,rect_2.y),rect_2.topleft,rect_2.topright,rect_2.bottomleft,rect_2.bottomright,rect_2.midleft,rect_2.midright,rect_2.center]
@@ -903,7 +944,9 @@ def rectsDistance(rect_1,rect_2):
 		for pos_2 in positions_2:#para cada posição do rect_2
 			distances.append(pointsDistance(pos_1,pos_2))#armazena a distancia entre os dois
 	return min(distances)
+##
 
+#uma seleção de botões livre de grade, vai se mover para o botão mais próximo no sentido do movimento
 class freeSelection(abstractSelection):
 	def __init__(self,buttons_list,surface,movable=(True,True),actived=False):
 		self.options=buttons_list
@@ -944,7 +987,8 @@ class freeSelection(abstractSelection):
 			display.blit(self.img,center_pos)
 	def screenCall(self): return self.options[self.selected].link if self.called else None
 
-class iFreeSelection(freeSelection):#freeSelection que estica a surface para cobrir o botao inteiro
+#freeSelection que estica a surface para cobrir o botao inteiro
+class iFreeSelection(freeSelection):
 	def __init__(self,buttons_list,surface,ident,movable=(True,True),actived=False):
 		freeSelection.__init__(self,buttons_list,surface,movable,actived)
 		self.ident=ident
@@ -955,6 +999,7 @@ class iFreeSelection(freeSelection):#freeSelection que estica a surface para cob
 			display.blit(new_img,[button.pos[x]-self.ident for x in range(2)])
 		
 
+#funções para retornar uma surface com o texto com quebra de linha e numa largura máxima, a função que é utilizada é a textBox
 def truncline(text, font, maxwidth):
 	real=len(text)       
 	stext=text           
@@ -976,6 +1021,7 @@ def truncline(text, font, maxwidth):
 		done=0                        
 	return real, done, stext             
         
+
 def wrapline(text, font, maxwidth): 
 	done=0                      
 	wrapped=[]                  
@@ -992,7 +1038,7 @@ def wrap_multi_line(text, font, maxwidth):
 	lines = chain(*(wrapline(line, font, maxwidth) for line in text.splitlines()))
 	return list(lines)
 
-def textBox(text_string,font,width,text_color=(0,0,0),limit=None,anti_alias=True,background=None):
+def textBox(text_string,font,width,text_color=(0,0,0),limit=None,anti_alias=True,background=None,ident=(0,0)):
 	height=font.get_height()
 	
 	splited_text=text_string.splitlines()
@@ -1007,16 +1053,18 @@ def textBox(text_string,font,width,text_color=(0,0,0),limit=None,anti_alias=True
 	lines=len(splited_and_wraped_text) if not limit  or limit>len(splited_and_wraped_text) else limit
 	if limit!=None and limit<len(splited_and_wraped_text): 
 		splited_and_wraped_text[limit-1]=splited_and_wraped_text[limit-1][:-3]+'...'
-	surface=pygame.Surface((line_width,lines*(height+1)), pygame.SRCALPHA, 32)
+	surface=pygame.Surface((line_width+(ident[0]*2),(lines*(height+1))+(ident[1]*2)), pygame.SRCALPHA, 32)
 	if background:
 		try: surface.blit(background,(0,0))
 		except: surface.fill(background)
 	
 	for l in range(lines):
-		surface.blit( font.render( splited_and_wraped_text[l], anti_alias, text_color), (0,height*l))
+		surface.blit( font.render( splited_and_wraped_text[l], anti_alias, text_color), (ident[0],(height*l)+ident[1]))
 	return surface
+##
 
-#HARD CODE, rever futuramente.
+'''HARD CODE, rever futuramente.'''
+#classe que move uma innerScreen de acordo com o arrastar de um clique na tela, pode exibir uma barra proporcional ao tamanho e à posição do pedaço da tela exibido
 class innerScroller(object):
 	def __init__(self,innerscr,width,vel,color_1,color_2=None,pos=None):
 		self.screen=innerscr
@@ -1059,6 +1107,7 @@ class innerScroller(object):
 		if self.color_2: display.fill(self.color_2,self.rect_2)
 		display.fill(self.color_1,self.rect_1)
 
+#uma classe simples de exibir um texto renderizado, mas diferente da simpleImage ela pode ter seu texto alterado e re-renderizado
 class renderText(object):
 	def __init__(self,font,text,color,pos,surface_width=None):
 		self.setNewRender(font,text,color)
@@ -1082,19 +1131,17 @@ class renderText(object):
 	def blitOn(self,display):
 		display.blit(self.render,self.pos)
 
+#funções de redimensionamento de imagens, sozinhas ou em grupo
 def scaleImage(img,scale=0.5):
 	return pygame.transform.scale(img,(int(img.get_width()*scale),int(img.get_height()*scale)))
 def scaleGroup(img_list_origin,scale=0.5):
 	img_list=img_list_origin[:]
 	for i in range(len(img_list)):
-		img_list[i]=scaleImage(img_list[i],scale)
+		img_list[i]=scaleImage(img_list[i],scale)#img_list[i]=pygame.transform.scale(img_list[i],size)
 	return img_list
-def resizeGroup(img_list_origin,size):
-	img_list=img_list_origin[:]
-	for i in range(len(img_list)):
-		img_list[i]=pygame.transform.scale(img_list[i],size)
-	return img_list
+##
 
+#função para exibir a imagem do player alterada, usada na tela de Avatar
 class playerImage(object):
 	def __init__(self,source,center_pos,scale=1):
 		self.source=source
@@ -1105,6 +1152,7 @@ class playerImage(object):
 		img_crop=img.subsurface(img.get_rect(width=img.get_width()/3))
 		display.blit(img_crop,self.pos)
 
+#funções para substituir os pixels não-transparentes por uma cor, usada para mudar a cor da pele do avatar.
 def colorizeFull(image,new_color):
 	new_image=image.copy()
 	new_image.fill((0,0,0,255),None,pygame.BLEND_RGBA_MULT)
@@ -1114,7 +1162,9 @@ def colorizeFull(image,new_color):
 def colorizeFull_ip(image,new_color):
 	image.fill((0,0,0,255),None,pygame.BLEND_RGBA_MULT)
 	image.fill(new_color[0:3] + (0,), None, pygame.BLEND_RGBA_ADD)
+##
 
+#funções para converter entre os sistemas de cor hls e rgb, utilizadas para fazer a grade de degradê do colorPicker
 import colorsys
 def hls2rgb(h,l,s):
 	return tuple(i * 255 for i in colorsys.hls_to_rgb(h/360.0,l/100.0,s/100.0))
@@ -1122,6 +1172,7 @@ def rgb2hls(r,g,b):
 	hsl=list(colorsys.rgb_to_hls(r/255.0,g/255.0,b/255.0))
 	return tuple(hsl[i]*[360,100,100][i] for i in range(3))
 
+#selecionador de cor, usado para mudar a cor de pele do Avatar
 class colorPickerHLS(object):
 	def __init__(self,pos,button_size,bar_pos,bar_size,sample_pos,sample_size,first_color,function=None):
 		self.function=function

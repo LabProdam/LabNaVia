@@ -42,8 +42,8 @@ from popUp import *
 loadBlit()
 from trafficLight import trafficLight
 loadBlit()
-from debugLog import *
-loadBlit()
+#from debugLog import *
+#loadBlit()
 from avatarTools import *
 loadBlit()
 from tutorialTools import*
@@ -51,9 +51,9 @@ loadBlit()
 
 if not os.path.exists('data'):
 	os.mkdir('data')
-	print 'Directory data created!'
+	debugLog('Directory data created!')
 else:
-	print 'Directory data already exists.'
+	debugLog('Directory data already exists.')
 loadBlit()
 
 ####---- ----####
@@ -167,7 +167,7 @@ retry_button_2=functionButton(None,None,retry_img,((322//2)-(home_img[0].get_wid
 home_button_2=functionButton(None,None,home_img,(53,350-home_img[0].get_height()) )
 bg_all=pygame.image.load(dir_img+'bg.png').convert()
 scr_stages=screenObject((640,360),FPS,bg_all)
-scr_stages.setLoading(pygame.image.load(dir_menu+"loading2.png").convert_alpha())
+scr_stages.setLoading(pygame.image.load(dir_menu+"loading2.png").convert_alpha(),(130,100))
 stages_button=functionButton(None,scr_stages,stages_img,(270-stages_img[0].get_width(),346-stages_img[0].get_height()) )
 
 lista_score=[
@@ -190,16 +190,17 @@ b_width=biker_img.get_width()
 
 player=playerObject(10,[375,360-128-4],None,0.5,13)#194
 
-biker_pos_00 = [320-biker_img.get_width(),0-biker_img.get_height()]
-biker_pos_01 = [280+biker_img.get_width(),0-biker_img.get_height()]
+bike_y= 0-biker_img.get_height()
+biker_pos_00 = [320-biker_img.get_width(),bike_y]
+biker_pos_01 = [280+biker_img.get_width(),bike_y]
 
-biker_pos_02 = [300-biker_img.get_width(),0-biker_img.get_height()]
-biker_pos_03 = [300+biker_img.get_width(),0-biker_img.get_height()]
+biker_pos_02 = [300-biker_img.get_width(),bike_y]
+biker_pos_03 = [300+biker_img.get_width(),bike_y]
 
-biker_pos_04 = [280-biker_img.get_width(),0-biker_img.get_height()]
-biker_pos_05 = [320+biker_img.get_width(),0-biker_img.get_height()]
+biker_pos_04 = [280-biker_img.get_width(),bike_y]
+biker_pos_05 = [320+biker_img.get_width(),bike_y]
 
-biker_list_1=[
+biker_list_3=[
 passerbyObject(biker_pos_02,bikerFront_img,0.2,4,20*30),
 passerbyObject(biker_pos_03,biker_img,-0.3,-3,35*30),
 passerbyObject(biker_pos_04,bikerFront_img,0.15,2,50*30),
@@ -212,55 +213,157 @@ passerbyObject(biker_pos_05,biker_img,-0.15,-5,335*30)
 ]
 
 biker_list_2=[
-passerbyObject((275,0-biker_img.get_height()),bikerFront_img,0.2,4,120*30),
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.2,-4,230*30),
-passerbyObject((250,0-biker_img.get_height()),bikerFront_img,0.1,5,230*30),
-passerbyObject((370,0-biker_img.get_height()),biker_img,-0.1,-3,250*30),
-passerbyObject((220,0-biker_img.get_height()),bikerFront_img,0.3,3,320*30),
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.2,-4,400*30),
-passerbyObject((340,0-biker_img.get_height()),biker_img,-0.5,-3,480*30),
-passerbyObject((275,0-biker_img.get_height()),bikerFront_img,0.2,4,510*30),
-passerbyObject((250,0-biker_img.get_height()),bikerFront_img,0.1,5,550*30),
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.3,-4,650*30)
+passerbyObject((230,bike_y),bikerFront_img,0.4,10,0*30),
+
+passerbyObject((370,bike_y),bikerFront_img,0.4,10,15*30),
+passerbyObject((230,bike_y),bikerFront_img,0.4,8,15*30),
+
+passerbyObject((370,bike_y),bikerFront_img,0.4,10,30*30),
+
+passerbyObject((340,bike_y),bikerFront_img,0.4,10,45*30),
+
+passerbyObject((250,bike_y),biker_img,-0.4,-10,60*30),
+passerbyObject((370,bike_y),bikerFront_img,0.4,10,60*30),
+
+passerbyObject((370,bike_y),biker_img,-0.7,-5,75*30),
+passerbyObject((320,bike_y),biker_img,-0.7,-10,75*30),
+
+passerbyObject((270,bike_y),biker_img,-0.7,-5,90*30),
+passerbyObject((300,bike_y),bikerFront_img,0.7,10,90*30),
+
+passerbyObject((290,bike_y),biker_img,-0.7,-5,105*30),
+passerbyObject((270,bike_y),biker_img,-0.7,-5,105*30),
+
+
+passerbyObject((370,bike_y),bikerFront_img,0.8,10,220*30),
+passerbyObject((250,bike_y),biker_img,-0.7,-10,220*30),
+
+
+passerbyObject((250,bike_y),biker_img,-0.7,-10,280*30),
+
+
+passerbyObject((370,bike_y),biker_img,-0.7,-5,340*30),
+passerbyObject((320,bike_y),biker_img,-0.7,-10,340*30),
+
+passerbyObject((270,bike_y),biker_img,-0.7,-5,370*30),
+passerbyObject((300,bike_y),bikerFront_img,0.7,10,370*30),
+
+
+passerbyObject((370,bike_y),bikerFront_img,0.8,10,430*30),
+passerbyObject((250,bike_y),biker_img,-0.7,-10,430*30),
+
+passerbyObject((235,bike_y),bikerFront_img,0.8,10,460*30),
+passerbyObject((370,bike_y),biker_img,-0.7,-10,460*30),
+
+
+passerbyObject((260,bike_y),biker_img,-0.8,-10,520*30),
+
+passerbyObject((350,bike_y),biker_img,-0.8,-10,550*30),
+
+
+passerbyObject((260,bike_y),biker_img,-0.8,-10,670*30),
+passerbyObject((310,bike_y),bikerFront_img,0.8,10,670*30),
+
+
+passerbyObject((250,bike_y),biker_img,-0.4,-10,760*30),
+passerbyObject((370,bike_y),bikerFront_img,0.4,10,760*30),
+
+passerbyObject((370,bike_y),biker_img,-0.7,-5,790*30),
+passerbyObject((320,bike_y),biker_img,-0.7,-10,790*30),
+
+passerbyObject((270,bike_y),biker_img,-0.7,-5,820*30),
+passerbyObject((300,bike_y),bikerFront_img,0.7,10,820*30),
+
+
+passerbyObject((230,bike_y),biker_img,-0.4,-10,910*30),
+passerbyObject((370,bike_y),bikerFront_img,0.4,10,910*30),
+
+
+passerbyObject((250,bike_y),biker_img,-0.4,-10,970*30),
+passerbyObject((370,bike_y),bikerFront_img,0.4,10,970*30)
+]#+[passerbyObject((160+(x*10),bike_y),bikerFront_img,0,0,0*30) for x in xrange(10)]
+
+biker_list_1=[
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,10*30),
+passerbyObject((365,bike_y),bikerFront_img,0.4,6,10*30),
+passerbyObject((275,bike_y),bikerFront_img,0.4,6,15*30),
+passerbyObject((245,bike_y),bikerFront_img,0.4,6,20*30),
+passerbyObject((360,bike_y),biker_img,-0.2,-4,50*30),
+passerbyObject((235,bike_y),bikerFront_img,0.4,6,55*30),
+passerbyObject((275,bike_y),bikerFront_img,0.5,6,80*30),
+passerbyObject((245,bike_y),bikerFront_img,0.4,7,85*30),
+passerbyObject((245,bike_y),bikerFront_img,0.4,6,90*30),
+passerbyObject((360,bike_y),biker_img,-0.2,-4,100*30),
+passerbyObject((275,bike_y),bikerFront_img,0.2,4,125*30),
+passerbyObject((245,bike_y),bikerFront_img,0.4,7,135*30),
+passerbyObject((280,bike_y),bikerFront_img,0.2,3,150*30),
+
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,165*30),
+passerbyObject((350,bike_y),biker_img,-0.2,-6,170*30),
+passerbyObject((275,bike_y),bikerFront_img,0.4,6,190*30),
+passerbyObject((220,bike_y),bikerFront_img,0.4,7,200*30),
+
+passerbyObject((230,bike_y),bikerFront_img,0.4,6,210*30),
+passerbyObject((350,bike_y),biker_img,-0.2,-6,215*30),
+passerbyObject((260,bike_y),bikerFront_img,0.3,5,230*30),
+
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,245*30),
+passerbyObject((350,bike_y),biker_img,-0.2,-4,255*30),
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,285*30),
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,315*30),
+passerbyObject((350,bike_y),biker_img,-0.2,-4,335*30),
+
+passerbyObject((265,bike_y),bikerFront_img,0.2,4,360*30),
+passerbyObject((360,bike_y),biker_img,-0.2,-4,365*30),
+
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,385*30),
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,415*30),
+passerbyObject((350,bike_y),biker_img,-0.2,-4,425*30),
+
+passerbyObject((250,bike_y),bikerFront_img,0.2,4,430*30),
+passerbyObject((360,bike_y),biker_img,-0.1,-5,420*30),
+
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,445*30),
+passerbyObject((350,bike_y),biker_img,-0.2,-4,465*30),
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,485*30),
+passerbyObject((350,bike_y),biker_img,-0.2,-4,505*30),
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,515*30),
+
+passerbyObject((275,bike_y),bikerFront_img,0.4,5,550*30),
+passerbyObject((250,bike_y),bikerFront_img,0.1,3,570*30),
+passerbyObject((360,bike_y),biker_img,-0.2,-4,620*30),
+passerbyObject((275,bike_y),bikerFront_img,0.5,1,650*30),
+passerbyObject((360,bike_y),biker_img,-0.2,-4,750*30),
+passerbyObject((280,bike_y),bikerFront_img,0.2,5,755*30),
+passerbyObject((280,bike_y),bikerFront_img,0.3,6,888*30),
+
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,900*30),
+passerbyObject((350,bike_y),biker_img,-0.2,-4,910*30),
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,920*30),
+passerbyObject((220,bike_y),bikerFront_img,0.4,6,950*30),
+passerbyObject((260,bike_y),bikerFront_img,0.4,6,950*30),
+
+passerbyObject((220,bike_y),bikerFront_img,0.4,7,960*30),
+passerbyObject((260,bike_y),bikerFront_img,0.4,6,960*30)
 ]
 
-biker_list_3=[
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.2,-4,50*30),
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.2,-4,100*30),
-passerbyObject((275,0-biker_img.get_height()),bikerFront_img,0.2,4,125*30),
-passerbyObject((280,0-biker_img.get_height()),bikerFront_img,0.2,3,150*30),
-passerbyObject((350,0-biker_img.get_height()),biker_img,-0.2,-4,225*30),
-passerbyObject((260,0-biker_img.get_height()),bikerFront_img,0.3,5,230*30),
-passerbyObject((265,0-biker_img.get_height()),bikerFront_img,0.2,4,360*30),
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.2,-4,365*30),
-passerbyObject((250,0-biker_img.get_height()),bikerFront_img,0.2,4,430*30),
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.1,-5,420*30),
-passerbyObject((275,0-biker_img.get_height()),bikerFront_img,0.4,5,550*30),
-passerbyObject((250,0-biker_img.get_height()),bikerFront_img,0.1,3,570*30),
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.2,-4,620*30),
-passerbyObject((275,0-biker_img.get_height()),bikerFront_img,0.5,1,650*30),
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.2,-4,750*30),
-passerbyObject((280,0-biker_img.get_height()),bikerFront_img,0.2,5,755*30),
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.2,-4,820*30),
-passerbyObject((370,0-biker_img.get_height()),biker_img,-0.3,-6,850*30),
-passerbyObject((280,0-biker_img.get_height()),bikerFront_img,0.3,6,888*30),
-passerbyObject((360,0-biker_img.get_height()),biker_img,-0.2,-4,950*30),
-]
+debugLog('\n\tbiker1='+str(len(biker_list_1)))
+debugLog('\n\tbiker2='+str(len(biker_list_2)))
 
-
-trlt_list_1= [
+trlt_list_3= [
 trafficLight(9000,0,2,400,1500),
 trafficLight(5000,1,15,300,5000),
 trafficLight(9000,-1,5,200,9000)]
 
 trlt_list_2=[
-trafficLight(7000,1,8,200,175*30),
-trafficLight(5000,0,10,300,350*30),
-trafficLight(6000,0,7,420,450*30)
+trafficLight(5000, 1,8,200,130*30),
+trafficLight(9000, 0,10,300,490*30),
+trafficLight(5000, 0,7,420,700*30),
+trafficLight(9000, 0,10,300,940*30)
 ]
 
-trlt_list_3=[
-trafficLight(4000,0,5,320,260*30),
+trlt_list_1=[
+trafficLight(5000,0,1,500,260*30),
 trafficLight(5000,1,8,350,480*30),
 trafficLight(6000,-1,10,175,575*30),
 trafficLight(4000,0,7,420,900*30)
@@ -268,48 +371,168 @@ trafficLight(4000,0,7,420,900*30)
 
 
 obs_list_2=[
-50,
-80,
-100,
-180,
+#[ Y , X ] ou só Y
+[160,290],
+[190,360],[190,250],
+[250,230],
+[400,290],
+[550,290],
+[580,240],[580,300],[580,360],
+[730,300],[730,360],
+[850,245],[850,350],
+]
+
+
+obs_list_1=[
+#[ Y , X ] ou só Y
+[7,345],
+[10,365],
+[20,360],
+[30,320],
+[40,230],
+[80,360],
+[90,230],
+[190,360],
+[190,230],
+[250,230],
+[270,360],
+[280,230],
+[310,360],
+[310,230],
+[330,360],
+[350,230],
+
+[360,360],
+[370,230],
+[390,360],
+
+[400,350],
+
+[430,360],
+[440,230],
+[450,360],
+[460,230],
+[470,360],
+[490,230],
+[500,360],
+[510,230],
+[510,360],
+[530,230],
+[530,360],
+[540,230],
+
+[550,240],
+[580,240],
+[580,350],
+[580,360],
+[730,300],
+[730,360],
+[850,245],
+[850,350]
+]
+
+
+# obs_list_1=[
+# 80,
+# 100,
+# 240,
+# 300,
+# 350,
+# 360,
+# 400,
+# 425,
+# 450,
+# 475,
+# 650,
+# 750,
+# 830,
+# 850,
+# 880,
+# 950
+#]
+
+dog_list_2=[
+45,
 190,
-210,
-280,
-320,
-350,
-420,
-480,
-500,
-530,
-540,
-670
-]
-
-obs_list_3=[
-80,
-100,
-240,
-300,
-350,
-360,
-400,
-425,
-450,
-475,
-650,
+370,
+510,
 750,
-830,
-850,
-880,
-950
+930,
+1100,
+1380,
+1440
 ]
 
-dog_list_3=[
-70,
+dog_list_1=[
+60,
 220,
 550,
 800,
-980
+940
+]
+
+sewer_list_2=[
+# [y,x]
+[0,340],
+[160,280],
+[220,350],
+[310,240],
+[640,240],
+[880,320],
+[900,350],
+[990,240],
+[1140,240],
+[1280,320],
+[1330,350],
+[1400,240],
+[1430,240],
+[1470,320]
+]
+
+hole_list_2=[
+[90,265],
+[280,320],
+[371,280],
+[400,260],
+[500,320],
+[570,320],
+[820,270],
+[931,345],
+[1180,325],
+[1290,365],
+[1395,305],
+]#+[[0,230+(20*x)] for x in xrange(10)]
+
+tw_list_2=[
+[30,280],
+[105,230],
+[135,310],
+[160,360],
+[225,250],
+[310,280],
+[400,360],
+[480,340],
+[520,230],
+[640,360],
+[705,300],
+[730,260],
+[880,360],
+[945,310],
+[970,285],
+[1070,285],
+[1105,350],
+[1255,230],
+[1380,330],
+[1450,245]
+]
+
+solar_list_2=[
+[45,370],
+[250,250],
+[610,320],
+[885,230],
+[1280,230],
+[1440,230]
 ]
 
 sign_img=['placaLab.png','placaPref.png','placaGestao.png','placaSPAberta.png','placaSPCultura.png','placa00.png']
@@ -355,7 +578,7 @@ gpsingame_off=functionButton(setAutoGpsIngame,None,[onOffButton[0],onOffButton[2
 gpsingame_onoff=buttonList(gpsingame_on,gpsingame_off)
 
 
-scr_tutorial=screenObject((640,360),FPS,(100,255,100))
+scr_tutorial=screenObject((640,360),FPS,(0,0,0))
 scr_about=screenObject((640,360),FPS,bg_all )
 
 
@@ -413,14 +636,14 @@ if basic_debug:
 	scr_about.setTitle("Lab na Via - About")
 #AVATAR PERSONALIZADO:
 #'''
-shoes=[u"Papete Azul","Sapato Marrom", u"Tênis Verde"]
+shoes=[u"Papete Azul","Sapato Marrom", u"Tênis Verde",u"Tênis Branco"]
 pants=[u"Calça Jeans Azul",u"Calça Verde",u"Shorts Esportivo",u"Calça Jeans Preta",u"Calça Branca","Shorts Esportivo com Saia"]
-shirt=["Camisa Social Branca","Regata Azul","Blusa Verde","Camisa da CET","Blusa Preta Estampada","Regata Rosa","Camisa Social Acizentada","Camisa Social Rosa"]
+shirt=["Camisa do Lab Prodam","Regata Azul","Blusa Verde","Camisa da CET","Blusa Preta Estampada","Regata Rosa","Camisa Social Acizentada","Camisa Social Rosa"]
 hair=["Castanho Curto","Ruivo Cacheado","Loiro Curto","Preto Arrepiado","Loiro Escuro Longo","Castanho Cacheado","Rabo de Cavalo Acobreado","Black Power","Topete Loiro"]
 head=["Capacete Azul","Capacete Rosa","Elmo Grego",u"Chapéu de Pierrot","Elmo de Hermes",u"Chapéu de Palha"]
 avatar_tools=avatarTools(player
 	#,[pygame.image.load(dir_avatar+'skin'+str(x)+'.png').convert_alpha() for x in range(3)]
-	,[[pygame.image.load(dir_avatar+'shoes'+str(x)+'.png').convert_alpha(),shoes[x]] for x in range(3)]
+	,[[pygame.image.load(dir_avatar+'shoes'+str(x)+'.png').convert_alpha(),shoes[x]] for x in range(4)]
 	,[[pygame.image.load(dir_avatar+'pants'+str(x)+'.png').convert_alpha(),pants[x]] for x in range(6)]
 	,[[pygame.image.load(dir_avatar+'shirt'+str(x)+'.png').convert_alpha(),shirt[x]] for x in range(8)]
 	,[[pygame.image.load(dir_avatar+'hair'+str(x)+'.png').convert_alpha(),hair[x]] for x in range(9)]+[[pygame.Surface((1,1), pygame.SRCALPHA, 32),"Careca"]]
@@ -444,7 +667,7 @@ class radioList(object):
 	def setSelected(self,sk):
 		for button in self.buttons:
 			button.setSkin(0)
-		print sk
+		debugLog(sk)
 		self.buttons[sk].setSkin(1)
 
 move_img=[pygame.image.load(dir_img+'arrow'+str(x)+'.png').convert_alpha() for x in xrange(2)]
@@ -471,17 +694,21 @@ gps_item=None
 loadBlit()
 if android:
 	brake_img=[pygame.image.load(dir_img+'brakeN.png').convert_alpha(),pygame.image.load(dir_img+'brakeC.png').convert_alpha()]
-	move_img=[pygame.image.load(dir_img+'botaoTeste.png').convert_alpha()]#scaleGroup([])[0]  Agora isso tá lá em cima nos avatares
-	
+	move_img=[pygame.image.load(dir_img+'pedal1.png').convert_alpha()]#scaleGroup([])[0]  Agora isso tá lá em cima nos avatares
+	skin_move_img=[pygame.image.load(dir_img+'pedal2.png').convert_alpha()]
 	right_button=toggleFunctionButton(
 		lambda: player.playerAccel(+1), 							#click_function
 		None,														#link
-		move_img,													#img
+		[pygame.transform.flip(move,True,False) for move in move_img],#img
 		(640-move_img[0].get_width()-32,360-move_img[0].get_height()-32),	#pos
 		None,														#text
 		lambda: player.playerMove(+1))								#press_function
 
-	left_button=toggleFunctionButton(lambda: player.playerAccel(-1),None,[pygame.transform.flip(move,True,False) for move in move_img],(32,360-move_img[0].get_height()-32),None,lambda: player.playerMove(-1))
+	left_button=toggleFunctionButton(lambda: player.playerAccel(-1),None,move_img,(32,360-move_img[0].get_height()-32),None,lambda: player.playerMove(-1))
+	left_button.addSkin(skin_move_img)
+	right_button.addSkin([pygame.transform.flip(skin,True,False) for skin in skin_move_img])
+	right_button.setAutoSkin()
+	left_button.setAutoSkin()
 	right_button.inflateButton(128,55)
 	left_button.inflateButton(128,55)
 	brake_button=toggleFunctionButton(lambda: [player.playerBrake(0.5),left_button.callActivation(False),right_button.callActivation(False)],None,brake_img,(160,360-brake_img[0].get_height()),None,lambda: player.playerBrake(8))
@@ -489,8 +716,8 @@ if android:
 	
 	from jnius import *
 	from geo import*
-	lastUpdateText = renderText(chic_22,u"Última Atualização:", (255,255,255),(30,180))
-	lastUpdateTime = renderText(chic_16,u"-", (255,255,255),(30,210))
+	lastUpdateText = renderText(chic_18,u"Última Atualização:", (255,255,255),(30,195))
+	lastUpdateTime = renderText(chic_16,u"-", (255,255,255),(30,222))
 	atualizar_button=[pygame.image.load(dir_img+'int-CultbtnAtualizaOff.png').convert_alpha(),
 						   pygame.image.load(dir_img+'int-CultbtnAtualizaOn.png').convert_alpha()]
 						   
@@ -507,20 +734,23 @@ if android:
 			self.lnglat=(loc.longitude,loc.latitude,1500)
 			url=('http://spcultura.prefeitura.sp.gov.br/api/space/find?@select=id,',
 				 '&@order=name%20ASC&_geoLocation=GEONEAR')
-			self.finder=findUrl(url,self.lnglat,"name","location")#,"horario","site","acessibilidade")
-			self.auto=False
+			urlBr=('http://mapas.cultura.gov.br/api/space/find?@select=id,',
+				'&@order=name%20ASC&_geoLocation=GEONEAR')
+			self.finder=findUrl(url,urlBr,self.lnglat,"name","location")#,"horario","site","acessibilidade")
 			self.screen=screen
 			self.parentScreen = parentScreen
 			self.loading=False
-		def toggleAuto(self):
-			self.auto = not self.auto
-			self.loading=self.auto
-			pygame.time.set_timer(USEREVENT+6,1500 if self.auto else 0)
-			print self.auto
+			self.gps_on=False
+			self.updated=False
 		def preEvents(self):
-			self.posEvents()
+			self.finder.web_on=isNetworkConnected()
+			loc=self.gps_hardware.location
+			self.lnglat=(loc.longitude,loc.latitude,1500)
+			self.gps_on = self.lnglat[0]!=0.0 and self.lnglat[1]!=0.0 and self.gps_hardware.gps_on
+			debugGps(self.lnglat)
+			debugGps(self.gps_hardware.gps_on)
+			self.loading=False
 		def posEvents(self):
-			pygame.time.set_timer(USEREVENT+6,0)
 			self.loading=False
 		def getLocation(self):
 			loc=self.gps_hardware.location
@@ -531,125 +761,170 @@ if android:
 				timeStr = time.strftime("%d/%m/%y - %H:%M", time.localtime())
 				lastUpdateTime.setNewText(timeStr)
 			except Exception as ex:
-				print "setLastUpdate Error:\n\t"+str(ex)				
-		def update(self):
-									
+				debugGps("setLastUpdate Error:\n\t"+str(ex))
+		def update(self,show_load=False):
+			self.finder.web_on=isNetworkConnected()
+			if show_load:
+				self.screen.delAllItens()
+				self.loading=True
+				self.parentScreen.makeBlitOn()
+				self.loading=False
+				pygame.display.flip()
+			display=pygame.display.get_surface()
 			loc=self.gps_hardware.location
 			self.lnglat=(loc.longitude,loc.latitude,1500)
-			if self.lnglat[0]!=0.0 and self.lnglat[1]!=0.0:
+			if self.lnglat[0]!=0.0 and self.lnglat[1]!=0.0 and self.gps_hardware.gps_on:
+				self.updated=True
+				self.gps_on=True
 				debugGps('localização válida')
 				self.finder.run(self.lnglat)
-				dict_locals=self.finder.getLocals()
-				distances=self.finder.getDistances()
-				dict_events=self.finder.getEvents()
-				box_list=[]
-				linkSpace=[]
-				linkEvent=[]
-				debugGps('encontrou '+str(len(dict_locals))+' locais')
-				if len(dict_locals)>0:
-					text=dinB_22.render("LOCAIS",True,(255,255,255))
-					surf=pygame.Surface((330,text.get_height()+30))
-					surf.fill((150,200,200))
-					surf.blit(text,(10,10))
-					box_list.append( (simpleImage(surf,(15,15)),None) )
-				#Top separator
-				surf=pygame.Surface((0, 0))
-				surf.fill((0,0,0,0))
-				pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]
-				box_list.append( (simpleImage(surf,(15,pos)),None) )
-				num_elements = len(dict_locals)
-				for i in range(num_elements):
-					text_1=textBox(unicode(dict_locals[i]['name']),dinB_16,330-((20+15+25)*2),(255,255,255))
-					text_2=textBox(u'\nDistância : '+unicode(int(distances[i]))+' metros',dinL_12,330-((52+15)*2),(255,255,255))
-					surf_h=text_1.get_height()+text_2.get_height()+30
-					surface=pygame.Surface((330,surf_h if surf_h>70 else 70))
-					surface.fill((9,78,129))
-					surface.blit(text_1,(10,10))
-					surface.blit(text_2,(10,10+text_1.get_height()))
-				
-					if i < num_elements -1:
-						separator=pygame.Surface((330,5))
-						separator.fill((9,90,148))
-						surface.blit(separator, (0, surface.get_height()-5))
-
-					pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]
-					box_list.append((
-										simpleImage(surface, (15, pos)),										
-										urlButton(
-											"http://spcultura.prefeitura.sp.gov.br/busca/##(global:(enabled:(event:!t,space:!t),filterEntity:"
-											+"space"
-											+",map:(center:(lat:"
-											+str(self.lnglat[1])+",lng:"+str(self.lnglat[0])
-											+"),zoom:15),openEntity:(id:"+str(dict_locals[i]["id"])
-											+",type:"+"space"+")))"
-											,infogps_img,(270,pos + 7)),
-									))
-				debugGps('buscando '+str(len(dict_events))+' eventos')
-				if len(dict_events)>0:
-					text=dinB_22.render("EVENTOS",True,(255,255,255))
-					surf=pygame.Surface((330,text.get_height()+30))
-					surf.fill((150,200,200))
-					surf.blit(text,(10,10))
+				if self.finder.web_on==False:
+					self.loading=False
+					self.finder.emptyList()
+				else:
+					debugGps('self.finder.run terminou')
+					dict_events = self.finder.getEvents()
+					debugGps('update2')
+					box_list=[]
+					linkSpace=[]
+					linkEvent=[]
+					debugGps('encontrou '+str(len(self.finder.listObj))+' locais')
+					if len(self.finder.listObj)>0:
+						text=dinB_22.render(u"LOCAIS PRÓXIMOS (1.5km)",True,(255,255,255))
+						surf=pygame.Surface((330,text.get_height()+30))
+						surf.fill((150,200,200))
+						surf.blit(text,(10,10))
+						box_list.append( (simpleImage(surf,(15,15)),None) )
+					#Top separator
+					surf=pygame.Surface((0, 0))
+					surf.fill((0,0,0,0))
 					pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]
 					box_list.append( (simpleImage(surf,(15,pos)),None) )
-				num_elements = len(dict_events)
-				for i in range(0,num_elements):
-					text_1=textBox(unicode(dict_events[i]['name']),dinB_16,330-((20+15+25)*2),(255,255,255))
-					surf_h=text_1.get_height()+30
-					surface=pygame.Surface((330,surf_h if surf_h>70 else 70))
-					surface.fill((9,78,129))
-					surface.blit(text_1,(10,10))
+					num_elements = len(self.finder.listObj)
+					try:
+						for i in range(num_elements):
+							text_1=textBox(unicode(self.finder.listObj[i]["nome"]),dinB_16,330-((20+15+25)*2),(255,255,255))
+							text_2=textBox(u'\nDistância : '+unicode(int(self.finder.listObj[i]["distancia"]))+' metros',dinL_12,330-((52+15)*2),(255,255,255))
+							surf_h=text_1.get_height()+text_2.get_height()+30
+							surface=pygame.Surface((330,surf_h if surf_h>70 else 70))
+							surface.fill((9,78,129))
+							surface.blit(text_1,(10,10))
+							surface.blit(text_2,(10,10+text_1.get_height()))
+				
+							if i < num_elements -1:
+								separator=pygame.Surface((330,5))
+								separator.fill((9,90,148))
+								surface.blit(separator, (0, surface.get_height()-5))
+
+							pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]
+							if self.finder.listObj[i]["belongList"]=="spCult":
+								box_list.append((
+													simpleImage(surface, (15, pos)),										
+													urlButton(
+														"http://spcultura.prefeitura.sp.gov.br/busca/##(global:(enabled:(event:!t,space:!t),filterEntity:"
+														+"space"
+														+",map:(center:(lat:"
+														+str(self.lnglat[1])+",lng:"+str(self.lnglat[0])
+														+"),zoom:15),openEntity:(id:"+str(self.finder.listObj[i]["id"])
+														+",type:"+"space"+")))"
+														,infogps_img,(270,pos + 7)),
+												))
+							elif self.finder.listObj[i]["belongList"]=="brCult":
+								box_list.append((
+													simpleImage(surface, (15, pos)),										
+													urlButton(
+														"http://mapas.cultura.gov.br/busca/##(global:(enabled:(event:!t,space:!t),filterEntity:"
+														+"space"
+														+",map:(center:(lat:"
+														+str(self.lnglat[1])+",lng:"+str(self.lnglat[0])
+														+"),zoom:15),openEntity:(id:"+str(self.finder.listObj[i]["id"])
+														+",type:"+"space"+")))"
+														,infogps_img,(270,pos + 7)),
+												))
+						debugGps('buscando '+str(len(dict_events))+' eventos')
+						if len(dict_events)>0:
+							text=dinB_22.render(u"EVENTOS PRÓXIMOS (1.5km)",True,(255,255,255))
+							surf=pygame.Surface((330,text.get_height()+30))
+							surf.fill((150,200,200))
+							surf.blit(text,(10,10))
+							pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]
+							box_list.append( (simpleImage(surf,(15,pos)),None) )
+						num_elements = len(dict_events)
+						for i in range(0,num_elements):
+							text_1=textBox(unicode(dict_events[i]['name']),dinB_16,330-((20+15+25)*2),(255,255,255))
+							surf_h=text_1.get_height()+30
+							surface=pygame.Surface((330,surf_h if surf_h>70 else 70))
+							surface.fill((9,78,129))
+							surface.blit(text_1,(10,10))
 					
-					if i < num_elements -1:
-						separator=pygame.Surface((330,5))
-						separator.fill((9,90,148))
-						surface.blit(separator, (0, surface.get_height()-5))
+							if i < num_elements -1:
+								separator=pygame.Surface((330,5))
+								separator.fill((9,90,148))
+								surface.blit(separator, (0, surface.get_height()-5))
 					
-					pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]
-					box_list.append(
-										(
-										simpleImage(surface,(15,pos) ),
-										urlButton(
-											"http://spcultura.prefeitura.sp.gov.br/evento/"+str(dict_events[i]["id"])
-											,infogps_img,(270,pos + 7))
-										)
-									)
-									
-				debugGps('deletando itens antigos')
-				debugGps(len(self.screen.itens))
-				try:self.screen.delAllItens()
-				except Exception,e:print e
-				debugGps(len(self.screen.itens))
-				debugGps('adicionando itens novos')
-				for item in box_list:
-					self.screen.addItens(item[0],item[1])
-				debugGps('definindo novo tamanho do display')
-				size=( self.screen.display.get_width(),box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]+15 )
-				self.screen.display=pygame.Surface(size)
-				debugGps('seting_timer')
-				pygame.time.set_timer(USEREVENT+6,120000 if self.auto else 0)
-				debugGps('loading=false')
-				self.loading=False
-				debugGps('done')
-				self.setLastUpdate()
+							pos=box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]
+							box_list.append(
+												(
+												simpleImage(surface,(15,pos) ),
+												urlButton(
+													"http://spcultura.prefeitura.sp.gov.br/evento/"+str(dict_events[i]["id"])
+													,infogps_img,(270,pos + 7))
+												)
+											)
+					except Exception,e:debugGps(e)
+					self.finder.emptyList()	
+					debugGps('deletando itens antigos')
+					debugGps(len(self.screen.itens))
+					debugGps(self.screen.itens)
+					try:self.screen.delAllItens()
+					except Exception,e:debugGps(e)
+					debugGps(len(self.screen.itens))
+					debugGps('adicionando itens novos')
+					for item in box_list:
+						self.screen.addItens(item[0],item[1])
+					debugGps('definindo novo tamanho do display')
+					size=( self.screen.display.get_width(),box_list[-1][0].img.get_height()+box_list[-1][0].pos[1]+15 )
+					self.screen.display=pygame.Surface(size)
+					debugGps('loading=false')
+					self.loading=False
+					debugGps('done')
+					self.setLastUpdate()
 			else:
+				self.gps_on=False
 				debugGps('localização nula')
-				pygame.time.set_timer(USEREVENT+6,15000)
-		def loadUpdate(self):
-			global openUrl
-			if self.loading==False:
-				self.loading=True
-				pygame.time.set_timer(USEREVENT+6,0)
-		def eventControler(self,event,resize,move):
-			if event.type==USEREVENT+6:
-				self.loadUpdate()
 		def blitOn(self,display):
-			if self.loading: 
-				text_render=dinBd_32.render("CARREGANDO . . .",True,(255,255,0))
-				text_rect=text_render.get_rect()
-				text_rect.center=display.get_rect().center
-				display.blit(text_render,text_rect.topleft)
-				self.update()
+			try:
+				if self.loading:
+					text_render=dinBd_32.render("CARREGANDO . . .",True,(255,255,0))
+					display.blit(text_render,(30,180-text_render.get_height()))
+				elif not self.finder.web_on or not self.gps_on or not self.gps_hardware.gps_on:
+					text="Verifique seu dispositivo:"
+					if not self.finder.web_on:
+						text+=u"\nSem acesso à INTERNET"
+					if not self.gps_hardware.gps_on or not self.gps_on:
+						text+="\nSem aceso ao GPS"
+					text_render=textBox(text,chic_18,320,(255,255,0))
+					display.blit(text_render,(30,120))
+				elif self.updated:
+					if not self.finder.br_ping and not self.finder.sp_ping:
+						text_render_0=textBox(u"Não foi possível acessar os servidores",chic_18,253,(255,255,0))
+					elif self.finder.url_br_off and self.finder.url_sp_off:
+						text_render_0=textBox(u"Não foi possível acessar o serviço",chic_18,253,(255,255,0))
+					else:
+						if self.finder.len_locals+self.finder.len_events>0:
+							text_render_0=textBox("Foram encontrados:",chic_18,500,(255,255,255))
+							text_render_1=textBox(str(self.finder.len_locals)+" Locais\n"+str(self.finder.len_events)+" Eventos",chic_16,500,(255,255,255))
+							display.blit(text_render_1,(30,120+text_render_0.get_height()))
+						else:
+							text_render_0=textBox(u"Não há locais/eventos próximos (1.5km)",chic_18,253,(255,255,255))
+					if not self.finder.br_ping or not self.finder.sp_ping or self.finder.url_br_off or self.finder.url_sp_off:
+						text=u"código P"+str(int(not self.finder.sp_ping)+7)+str(int(not self.finder.br_ping)+5)+str(int(self.finder.url_sp_off))+str(int(self.finder.url_br_off))
+						text_render_2=textBox(text,chic_12,500,(150,200,200))
+						display.blit(text_render_2,(290-text_render_2.get_width(),183-text_render_2.get_height()))
+					display.blit(text_render_0,(30,120))
+			except Exception,e:debugGps(e)
+				#if self.finder.url_sp_off or self.finder.url_br_off:
+					
 	loadBlit()
 	inner_screen=innerScreen((330,600),(0,0),None)
 	outer_screen=innerScreen((440,360),(300,0),None,
@@ -665,19 +940,24 @@ if android:
 		gps_item,
 		lastUpdateText,
 		lastUpdateTime,
-		functionButton(gps_item.update,None,atualizar_button,(25,250))
+		functionButton(gps_item.update,None,atualizar_button,(25,250),None,None,True)
 		)
 	
 ###########---------------------------FASES---------------------------###########
-stage_01=gameObject(
-		"Fase 1",
-		400*30,
-		pygame.image.load(dir_menu+"odometro_400m.png").convert_alpha(),
+stage_03=gameObject(
+		"Fase 3",
+		1500*30,
+		5,
 		player,
-		biker_list_1,
-		trlt_list_1,
-		[],
-		[],
+		0,
+		biker_list_2,
+		trlt_list_2,
+		obs_list_2,
+		dog_list_2,
+		sewer_list_2,
+		hole_list_2,
+		tw_list_2,
+		solar_list_2,#+[[solar[0]+1500*30,solar[1]]for solar in solar_list_2],
 		sign_list,
 		
 		scr_lose,
@@ -690,17 +970,54 @@ stage_01=gameObject(
 		resume_button,
 		pause_tgscr,
 		[right_button,left_button,brake_button] if android else [],
-		gps_item
+		gps_item,
+		1
 		)
 loadBlit()
 stage_02=gameObject(
 		"Fase 2",
-		700*30,
-		pygame.image.load(dir_menu+"odometro_700m.png").convert_alpha(),
+		1500*30,
+		5,
 		player,
+		3000,
 		biker_list_2,
 		trlt_list_2,
 		obs_list_2,
+		dog_list_2,
+		sewer_list_2,
+		hole_list_2,
+		tw_list_2,
+		solar_list_2,
+		sign_list,
+		
+		scr_lose,
+		scr_win,
+		scr_score,
+		[retry_button,retry_button_2],
+		[home_button,home_button_2],
+		stages_button,
+		pause_button,
+		resume_button,
+		pause_tgscr,
+		[right_button,left_button,brake_button] if android else [],
+		gps_item,
+		0,
+		True
+		)
+loadBlit()		
+stage_01=gameObject(
+		"Fase 1",
+		1000*30,
+		4,
+		player,
+		0,
+		biker_list_1,
+		trlt_list_1,
+		obs_list_1,
+		dog_list_1,
+		[],
+		[],
+		[],
 		[],
 		sign_list,
 		
@@ -714,31 +1031,9 @@ stage_02=gameObject(
 		resume_button,
 		pause_tgscr,
 		[right_button,left_button,brake_button] if android else [],
-		gps_item
-		)
-loadBlit()		
-stage_03=gameObject(
-		"Fase 3",
-		1000*30,
-		pygame.image.load(dir_menu+"odometro_1000m.png").convert_alpha(),
-		player,
-		biker_list_3,
-		trlt_list_3,
-		obs_list_3,
-		dog_list_3,
-		sign_list,
-		
-		scr_lose,
-		scr_win,
-		scr_score,
-		[retry_button,retry_button_2],
-		[home_button,home_button_2],
-		stages_button,
-		pause_button,
-		resume_button,
-		pause_tgscr,
-		[right_button,left_button,brake_button] if android else [],
-		gps_item
+		gps_item,
+		0,
+		False
 		)
 loadBlit()
 
@@ -799,8 +1094,12 @@ loadBlit()
 if not android:
 	culture_url="http://spcultura.prefeitura.sp.gov.br/busca/##(global:(enabled:(event:!t,space:!t),filterEntity:event))"
 
+ee_img=[pygame.image.load(dir_bikers+"bikerS"+str(x)+".png").convert_alpha() for x in xrange(2)]
+ee_button=simpleButton([pygame.Surface((266,113),SRCALPHA,32).convert_alpha()],(0,0))
+scr_start.addItens(ee_button)
+ee_counter=0
 class idleBikers(object):
-	def __init__(self, min_time,max_time,event,imgs,moves):
+	def __init__(self, min_time,max_time,event,imgs,moves,flip=False):
 		self.min_time=min_time
 		self.max_time=max_time
 		self.event=event
@@ -808,6 +1107,8 @@ class idleBikers(object):
 		self.moves_list=moves
 		self.diff=[0,0]
 		self.preEvents()
+		self.e_e=0
+		self.flip=flip
 	def preEvents(self):
 		try:
 			pygame.time.set_timer(self.event,random.randint(self.min_time,self.max_time))
@@ -817,17 +1118,17 @@ class idleBikers(object):
 			self.move=random.choice(self.moves_list)
 			self.pos=self.move[0][0]
 			self.move_state=0
-		except Exception,e:print 'pre: '+str(e)
+		except Exception,e:debugLog('pre: '+str(e))
 	def posEvents(self):
 		try:
 			pygame.time.set_timer(self.event,0)
 			self.draw=True
-		except Exception,e:print 'pos: '+str(e)
+		except Exception,e:debugLog('pos: '+str(e))
 	def eventControler(self,event,resize,move):
 		try:
 			if event.type==self.event:
 				self.posEvents()
-		except Exception,e:print 'event: '+str(e)
+		except Exception,e:debugLog('event: '+str(e))
 	def idleMotion(self):
 		self.pos=[self.pos[x]+(self.move[self.move_state][1][x]*self.vel) for x in xrange(2)]
 		move=self.move[self.move_state+1][0]
@@ -841,30 +1142,40 @@ class idleBikers(object):
 			if self.move_state==len(self.move)-1:
 				self.preEvents()
 	def blitOn(self,display):
+		global ee_img, ee_button, ee_counter
 		try:
+			if ee_button.actived:
+				self.e_e+=1
+				ee_counter+=1
+				if ee_counter==3:
+					ee_button.actived=False
+					ee_counter=0
 			if self.draw:
 				self.idleMotion()
-				display.blit(self.img[self.move_state],self.pos)
-		except Exception,e:print 'blit: '+str(e)
+				state=len(self.move)-2-self.move_state if self.flip else self.move_state
+				img=self.img[state] if self.e_e<10 else ee_img[state]
+				display.blit(img,self.pos)
+		except Exception,e:debugLog('blit: '+str(e))
 
 menu_tgscr.addItens(geniusButton((142,134),60,120,[pygame.image.load(dir_menu+'menu'+str(x)+'.png').convert_alpha() for x in range(6)],(335,47),[scr_gps if android else culture_url,scr_avatar,scr_options,scr_tutorial,scr_stages],[mixer.Sound(dir_sound+"buttonSound.mp3"),0] ))#(0,0)=(335,47)
 info_tgscr.addItens(linkButton(scr_about,[pygame.image.load(dir_menu+'sobre'+str(x)+'.png').convert_alpha() for x in range(2)],(16,296)))#(0,0)=(16,296)
 loadBlit()
 pygame.time.set_timer(USEREVENT+2,400)
 c_ciclista_animation=animatedSprite(pygame.image.load(dir_img+"cciclista_off.png").convert_alpha(),pygame.Rect(0,0,70,70),(0,0),USEREVENT+2)
+bikers_home=[[pygame.image.load(dir_bikers+"biker"+str(x)+str(y)+".png").convert_alpha() for y in xrange(2)]for x in xrange(3)]
 scr_start.addItens( 
 						idleBikers(500,5000,USEREVENT+6,
-							[[pygame.image.load(dir_bikers+"biker"+str(x)+str(y)+".png").convert_alpha() for y in xrange(1,-1,-1)]for x in xrange(3)],
+							bikers_home,
 							[[ [(-80,75),(1,-0.245)]
 							, [(500,-65),(-1,0.245)]
-							, [(-80,100)]]]),
+							, [(-80,100)]]],True),
 						idleBikers(1500,5500,USEREVENT,
-							[[pygame.image.load(dir_bikers+"biker"+str(x)+str(y)+".png").convert_alpha() for y in xrange(2)]for x in xrange(3)],
+							bikers_home,
 							[[ [(640,-25),(-1,0.29)]
 							, [(200,300),(1,-0.29)]
 							, [(640,-20)]]]),
 						idleBikers(1000,6000,USEREVENT+1,
-							[[pygame.image.load(dir_bikers+"biker"+str(x)+str(y)+".png").convert_alpha() for y in xrange(2)]for x in xrange(3)],
+							bikers_home,
 							[[ [(640,60),(-1,0.33)]
 							, [(200,300),(1,-0.33)]
 							, [(640,60)]]]),
@@ -895,7 +1206,7 @@ lista_de_fases=[tutorialFases(u"Início",pygame.Rect(220,110,200,60), screenshot
 				tutorialFases(u"Toque alternadamente as setas para pedalar",pygame.Rect(32,258,50,70), screenshot_1,mao_icone_baixo,(32,200)),
 				tutorialFases(u"Mantenha uma das setas pressionada\npara usar o guidão\ne mover-se lateralmente.",pygame.Rect(555,258,50,70), screenshot_2,mao_icone_baixo,(555,200)),
 				tutorialFases(u"O freio é útil para evitar acidentes e respeitar o trânsito",pygame.Rect(160,300,320,60),screenshot_3,mao_icone_baixo,(300,250)),
-				tutorialFases(u"As placas à direita da pista podem\nexibir pontos culturais próximos a você. \nAtive GPS e internet para vê-los!",pygame.Rect(460,180,119,75),screenshot_4,ponteiro,(480,90)),
+				tutorialFases(u"As placas à direita da pista podem\nexibir pontos culturais próximos a você. \nAtive GPS e internet para vê-los!",pygame.Rect(73,119,105,70),screenshot_4,ponteiro,(84,50)),
 				tutorialFases(u"Cuidado, sua proteção pode sofrer danos ao colidir.\n Preste atenção na sua proteção, \nela é representada por estes capacetes.",pygame.Rect(0,110,70,70),screenshot_5,ponteiro_cima,(0,160)),
 				tutorialFases(u"Você pode recuperar sua proteção \nusando a sua saúde acumulada na corrida, \npara isso clique neste coração.",pygame.Rect(0,180,60,50),screenshot_6,mao_icone_baixo,(0,120)),
 				tutorialFases(u"Os corações são coletados a cada 200 metros da pista.\nO círculo vermelho representa a sua posição na pista.",pygame.Rect(580,65,60,200),screenshot_7,ponteiro_cima,(580,240)),
@@ -989,13 +1300,13 @@ def main():
 		mute_unmute.buttons[mute_unmute.getPreviousState()].callFunction()
 		load_file.close()
 	except Exception,e:
-		print "load_file\n\t"+str(e)
+		debugLog("load_file\n\t"+str(e))
 	screenLoop(scr_start)
 	load_file=open(dir_data+"config_data.lab","wb")
 	try:
 		cPickle.dump(gpsingame_onoff.state,load_file)
 		cPickle.dump(mute_unmute.state,load_file)
-	except Exception,e:print "load_file\n\t"+str(e)
+	except Exception,e:debugLog("load_file\n\t"+str(e))
 	load_file.close()
 	debugLog('fim programa\nfechando display...')
 	try:pygame.display.quit()

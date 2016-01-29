@@ -2,6 +2,8 @@
 import pygame,os, cPickle
 from pygame.locals import *
 from screenTools import colorizeFull
+from debugLog import *
+
 dir_avatar='images'+str(os.sep)+'avatar'+str(os.sep)
 dir_data='data'+str(os.sep)
 try:font=pygame.font.Font(None,22)
@@ -26,12 +28,12 @@ class avatarTools(object):
 			save_file=open(dir_data+"avatar_data.lab",'wb')
 			save_file.truncate()
 			save_file.close()
-		except Exception,e:print e
+		except Exception,e:debugLog(e)
 		for avatar in self.avatar:
 			avatar[0]=0
 		self.skin_color=(191,143,88)
 		self.updateAvatar()
-		print 'cleared avatar'
+		debugLog('cleared avatar')
 	def preEvents(self):
 		try:
 			save_file=open(dir_data+"avatar_data.lab",'rb')
@@ -39,7 +41,7 @@ class avatarTools(object):
 				avatar[0]=cPickle.load(save_file)
 			self.skin_color=cPickle.load(save_file)
 			save_file.close()
-		except Exception,e:print e
+		except Exception,e:debugLog(e)
 		self.updateAvatar()
 	def posEvents(self):
 		try:
@@ -48,7 +50,7 @@ class avatarTools(object):
 				cPickle.dump(avatar[0],save_file)
 			cPickle.dump(self.skin_color,save_file)
 			save_file.close()
-		except Exception,e:print e
+		except Exception,e:debugLog(e)
 	def setSkinColor(self,new_color):
 		self.skin_color=new_color
 		self.updateAvatar()
@@ -86,7 +88,7 @@ class avatarTools(object):
 					display.blit(text,pos)
 					display.blit(self.icons[4-av],(0,pos[1]-15))
 					pos[1]+=72
-				except Exception,e:print e
+				except Exception,e:debugLog(e)
 	def blitOn(self,display):
 		global font
 		if font:
@@ -98,4 +100,4 @@ class avatarTools(object):
 			if av<len(self.avatar) and av>=0:
 				text=font.render(self.avatar[av][1][self.avatar[av][0]][1],True,(255,255,255))
 				try:display.blit(text,text.get_rect(center=pos_center).topleft )
-				except Exception,e:print e
+				except Exception,e:debugLog(e)

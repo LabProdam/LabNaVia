@@ -83,9 +83,9 @@ class playerObject(bikerObject):
 		self.pos[0]+=4*direction
 		self.simpleAccel()
 		#Penalidade de velociadade por sair da pista
-		if self.pos[0]<150:
+		if self.pos[0]<60:
 			self.vel*=0.7
-		if self.pos[0]>450:
+		if self.pos[0]>510:
 			self.vel*=0.7
 	def playerMotion(self):
 		#desaceleracao, com limite para desaceleracao total
@@ -100,11 +100,11 @@ class playerObject(bikerObject):
 		self.odometer+=self.vel #deslocamento/10 -> *nao pode diminuir aqui senao afeta a placa da prodam que usa isso pro proprio deslocamento*
 		self.pos[0]+=self.h_vel
 		#Limitacao do Ciclista com espaco levar penalidade
-		if self.pos[0]>500:
-			self.pos[0]=500
+		if self.pos[0]>550:
+			self.pos[0]=550
 			self.h_vel=0
-		if self.pos[0]<100:
-			self.pos[0]=100
+		if self.pos[0]<10:
+			self.pos[0]=10
 			self.h_vel=0
 		try:self.updateHitBox()
 		except Exception,e:print e
@@ -156,7 +156,7 @@ class passerbyObject(bikerObject):
 		self.stop=False
 	def passerbyMotion(self,player_motion):
 		self.simpleAccel()
-		self.pos[1] += self.vel + player_motion if self.pos[1]>-self.img.get_height() else player_motion
+		self.pos[1] += self.vel + player_motion if self.pos[1]>-self.img.get_height()-9 else player_motion
 	def collide(self,player):
 		retorno=0
 		if self.hit_box.inflate(self.hit_box.w*0.2,self.hit_box.h*0.6).colliderect(player.hit_box):

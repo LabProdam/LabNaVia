@@ -1,0 +1,1 @@
+{"orientation": "landscape", "include_pil": false, "expansion": false, "icon_name": "LabNaVia", "include_sqlite": false, "permissions": ["INTERNET", "VIBRATE", "GPS_PROVIDER", "ACCESS_FINE_LOCATION"], "layout": "internal", "name": "LabNaVia", "package": "br.gov.sp.labprodam.labnavia", "source": false, "version": "3.0.8", "numeric_version": "30008"}

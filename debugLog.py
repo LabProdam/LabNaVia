@@ -11,9 +11,19 @@ if not pygame.font.get_init():
 
 dinB_22=pygame.font.Font('fontes'+str(os.sep)+"DIN-Black.otf",22)
 
-def debugLog(string):
+import traceback
+def debugLog(*string):
 	global basic_debug
-	if basic_debug: print string
+	try:
+		if basic_debug: 
+			string_final=''
+			for s in string:
+				string_final+=str(s)
+			print string_final
+	except Exception as ex:
+		print "Excecao>>>>>>>>>>>>>>>>>"
+		print ex.message
+		print traceback.format_tb()
 	
 def debugGps(string):
 	global gps_debug
